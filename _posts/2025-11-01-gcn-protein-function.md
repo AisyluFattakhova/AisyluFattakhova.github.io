@@ -219,7 +219,7 @@ edge_index = torch.tensor([[0, 1, 2, ...],  # Source nodes
                            [1, 0, 3, ...]])  # Destination nodes
 ```
 
-The `edge_index` format is more efficient than a full adjacency matrix for sparse graphs. Instead of storing an \( N \times N \) matrix where most entries are zero, we only store the edges that actually exist.
+The `edge_index` format is more efficient than a full adjacency matrix for sparse graphs. Instead of storing an {::nomarkdown}\( N \times N \){:/} matrix where most entries are zero, we only store the edges that actually exist.
 
 Now that we know how graphs work and how to represent them in PyTorch, let's dive into our specific problem: predicting protein functions from their interaction networks.
 
@@ -540,10 +540,244 @@ Where:
 
 ### Why Multiple Layers?
 
-- **Layer 1:** Each node sees its immediate neighbors
-- **Layer 2:** Each node sees neighbors of neighbors (2-hop)
-- **Layer 3:** Each node sees 3-hop neighborhoods
-- **Layer 4:** Each node sees 4-hop neighborhoods
+Each layer expands the **receptive field** of a node, allowing it to gather information from progressively distant neighbors:
+
+<div class="layer-hops-visualization" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+  <div class="layer-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); color: white;">
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">1</div>
+      <div style="font-size: 1.1rem; font-weight: 600; opacity: 0.95;">Layer 1</div>
+    </div>
+    <div id="layer1-graph" style="height: 180px; background: rgba(255, 255, 255, 0.15); border-radius: 10px; margin-bottom: 1rem;"></div>
+    <div style="text-align: center; font-size: 0.95rem; opacity: 0.9;">
+      <strong>1-hop:</strong> Immediate neighbors
+    </div>
+  </div>
+  
+  <div class="layer-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3); color: white;">
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">2</div>
+      <div style="font-size: 1.1rem; font-weight: 600; opacity: 0.95;">Layer 2</div>
+    </div>
+    <div id="layer2-graph" style="height: 180px; background: rgba(255, 255, 255, 0.15); border-radius: 10px; margin-bottom: 1rem;"></div>
+    <div style="text-align: center; font-size: 0.95rem; opacity: 0.9;">
+      <strong>2-hop:</strong> Neighbors of neighbors
+    </div>
+  </div>
+  
+  <div class="layer-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 15px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3); color: white;">
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">3</div>
+      <div style="font-size: 1.1rem; font-weight: 600; opacity: 0.95;">Layer 3</div>
+    </div>
+    <div id="layer3-graph" style="height: 180px; background: rgba(255, 255, 255, 0.15); border-radius: 10px; margin-bottom: 1rem;"></div>
+    <div style="text-align: center; font-size: 0.95rem; opacity: 0.9;">
+      <strong>3-hop:</strong> Three steps away
+    </div>
+  </div>
+  
+  <div class="layer-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 15px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(250, 112, 154, 0.3); color: white;">
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">4</div>
+      <div style="font-size: 1.1rem; font-weight: 600; opacity: 0.95;">Layer 4</div>
+    </div>
+    <div id="layer4-graph" style="height: 180px; background: rgba(255, 255, 255, 0.15); border-radius: 10px; margin-bottom: 1rem;"></div>
+    <div style="text-align: center; font-size: 0.95rem; opacity: 0.9;">
+      <strong>4-hop:</strong> Four steps away
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  if (typeof window !== 'undefined') {
+    function createHopGraph(containerId, hops) {
+      if (typeof vis === 'undefined') return;
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      // Central node
+      const nodes = [{ 
+        id: 0, 
+        label: 'Center', 
+        x: 0, 
+        y: 0, 
+        fixed: true,
+        color: { background: '#ffffff', border: '#333333' },
+        font: { color: '#000000', size: 12 },
+        size: 20
+      }];
+
+      const edges = [];
+      let nodeId = 1;
+      const radius = 50;
+      const angles = {
+        1: [0, Math.PI * 2 / 3, Math.PI * 4 / 3], // 3 immediate neighbors
+        2: [0, Math.PI * 2 / 3, Math.PI * 4 / 3, Math.PI / 6, Math.PI * 5 / 6, Math.PI * 3 / 2], // 6 nodes
+        3: [], // Will be auto-generated
+        4: [] // Will be auto-generated
+      };
+
+      // Layer 1: 3 immediate neighbors
+      if (hops === 1) {
+        const layer1Nodes = 3;
+        for (let i = 0; i < layer1Nodes; i++) {
+          const angle = angles[1][i];
+          nodes.push({
+            id: nodeId++,
+            label: `N${i+1}`,
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius,
+            fixed: true,
+            color: { background: 'rgba(255, 255, 255, 0.9)', border: '#4c51bf' },
+            font: { color: '#000000', size: 11 },
+            size: 16
+          });
+          edges.push({ from: 0, to: nodeId - 1, color: { color: 'rgba(255, 255, 255, 0.8)' }, width: 2 });
+        }
+      }
+      // Layer 2: 2-hop neighbors (6 nodes total)
+      else if (hops === 2) {
+        // First layer neighbors
+        const layer1Nodes = 3;
+        for (let i = 0; i < layer1Nodes; i++) {
+          const angle = angles[1][i];
+          nodes.push({
+            id: nodeId++,
+            label: `N${i+1}`,
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius,
+            fixed: true,
+            color: { background: 'rgba(255, 255, 255, 0.9)', border: '#4c51bf' },
+            font: { color: '#000000', size: 11 },
+            size: 16
+          });
+          edges.push({ from: 0, to: nodeId - 1, color: { color: 'rgba(255, 255, 255, 0.8)' }, width: 2 });
+        }
+        // Second layer neighbors
+        for (let i = 0; i < layer1Nodes; i++) {
+          const angle = angles[1][i];
+          const layer2NodeId = nodeId++;
+          nodes.push({
+            id: layer2NodeId,
+            label: `N${i+4}`,
+            x: Math.cos(angle) * (radius * 1.8),
+            y: Math.sin(angle) * (radius * 1.8),
+            fixed: true,
+            color: { background: 'rgba(255, 255, 255, 0.7)', border: '#764ba2' },
+            font: { color: '#000000', size: 10 },
+            size: 14
+          });
+          // Connect to first layer neighbor
+          edges.push({ from: i + 1, to: layer2NodeId, color: { color: 'rgba(255, 255, 255, 0.6)' }, width: 1.5 });
+        }
+      }
+      // Layer 3: 3-hop neighbors
+      else if (hops === 3) {
+        // Build a tree structure
+        const layers = [
+          [{ angle: 0, dist: radius }],
+          [{ angle: Math.PI / 6, dist: radius * 1.5 }, { angle: -Math.PI / 6, dist: radius * 1.5 }],
+          [{ angle: Math.PI / 3, dist: radius * 2.2 }, { angle: -Math.PI / 3, dist: radius * 2.2 }, { angle: Math.PI, dist: radius * 2.2 }]
+        ];
+        
+        let prevLayerIds = [0];
+        layers.forEach((layer, layerIdx) => {
+          const currentLayerIds = [];
+          layer.forEach((nodeSpec) => {
+            const nodeIdNew = nodeId++;
+            nodes.push({
+              id: nodeIdNew,
+              label: `L${layerIdx+1}`,
+              x: Math.cos(nodeSpec.angle) * nodeSpec.dist,
+              y: Math.sin(nodeSpec.angle) * nodeSpec.dist,
+              fixed: true,
+              color: { background: `rgba(255, 255, 255, ${0.9 - layerIdx * 0.15})`, border: layerIdx === 0 ? '#4c51bf' : '#00f2fe' },
+              font: { color: '#000000', size: 10 },
+              size: 16 - layerIdx * 2
+            });
+            // Connect to a node from previous layer
+            const parentId = prevLayerIds[Math.floor(Math.random() * prevLayerIds.length)];
+            edges.push({ from: parentId, to: nodeIdNew, color: { color: `rgba(255, 255, 255, ${0.8 - layerIdx * 0.2})` }, width: 2 - layerIdx * 0.3 });
+            currentLayerIds.push(nodeIdNew);
+          });
+          prevLayerIds = [...prevLayerIds, ...currentLayerIds];
+        });
+      }
+      // Layer 4: 4-hop neighbors
+      else if (hops === 4) {
+        // Build a deeper tree structure
+        const layers = [
+          [{ angle: 0, dist: radius }],
+          [{ angle: Math.PI / 4, dist: radius * 1.4 }, { angle: -Math.PI / 4, dist: radius * 1.4 }],
+          [{ angle: Math.PI / 3, dist: radius * 2.0 }, { angle: -Math.PI / 3, dist: radius * 2.0 }],
+          [{ angle: Math.PI / 2, dist: radius * 2.6 }, { angle: -Math.PI / 2, dist: radius * 2.6 }, { angle: Math.PI, dist: radius * 2.6 }]
+        ];
+        
+        let prevLayerIds = [0];
+        layers.forEach((layer, layerIdx) => {
+          const currentLayerIds = [];
+          layer.forEach((nodeSpec) => {
+            const nodeIdNew = nodeId++;
+            nodes.push({
+              id: nodeIdNew,
+              label: `L${layerIdx+1}`,
+              x: Math.cos(nodeSpec.angle) * nodeSpec.dist,
+              y: Math.sin(nodeSpec.angle) * nodeSpec.dist,
+              fixed: true,
+              color: { background: `rgba(255, 255, 255, ${0.9 - layerIdx * 0.15})`, border: layerIdx === 0 ? '#4c51bf' : '#fee140' },
+              font: { color: '#000000', size: 9 },
+              size: 16 - layerIdx * 2
+            });
+            const parentId = prevLayerIds[Math.floor(Math.random() * prevLayerIds.length)];
+            edges.push({ from: parentId, to: nodeIdNew, color: { color: `rgba(255, 255, 255, ${0.8 - layerIdx * 0.15})` }, width: 2 - layerIdx * 0.25 });
+            currentLayerIds.push(nodeIdNew);
+          });
+          prevLayerIds = [...prevLayerIds, ...currentLayerIds];
+        });
+      }
+
+      const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+      const options = {
+        physics: false,
+        interaction: { zoomView: false, dragView: false, dragNodes: false },
+        nodes: {
+          shape: 'dot',
+          font: { color: '#000000', size: 11 }
+        },
+        edges: {
+          smooth: false,
+          arrows: { to: false }
+        },
+        layout: {
+          hierarchical: false
+        }
+      };
+
+      new vis.Network(container, data, options);
+    }
+
+    function initLayerHops() {
+      const tryInit = () => {
+        if (typeof vis !== 'undefined') {
+          createHopGraph('layer1-graph', 1);
+          createHopGraph('layer2-graph', 2);
+          createHopGraph('layer3-graph', 3);
+          createHopGraph('layer4-graph', 4);
+        } else {
+          setTimeout(tryInit, 100);
+        }
+      };
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryInit);
+      } else {
+        tryInit();
+      }
+    }
+
+    initLayerHops();
+  }
+</script>
 
 <div class="info-box warning">
   <strong>⚠️ Over-smoothing Problem:</strong> Deeper networks allow information to propagate farther, but too many layers can lead to **over-smoothing** (all nodes become similar). We'll experiment with different depths to find the sweet spot.
