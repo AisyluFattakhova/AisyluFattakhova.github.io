@@ -246,10 +246,12 @@ class GCN(torch.nn.Module):
 
 Since this is multi-label classification, we use **Binary Cross Entropy with Logits Loss**:
 
+{::nomarkdown}
 \[
 \mathcal{L} = - \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{121}
 \left[ y_{ij} \cdot \log(\sigma(\hat{y}_{ij})) + (1 - y_{ij}) \cdot \log(1 - \sigma(\hat{y}_{ij})) \right]
 \]
+{:/}
 
 Each of the 121 classes is treated as an **independent binary classification problem**. This is different from standard CrossEntropyLoss, which assumes mutually exclusive classes.
 
