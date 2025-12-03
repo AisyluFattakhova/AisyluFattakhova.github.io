@@ -666,59 +666,87 @@ Explore how message passing works in this detailed interactive visualization. Wa
         return;
       }
       
-      // Define all steps
-      if (currentStep === 0) {
-        // Step 1: Highlight neighbors
-        updateStatusPanel(1);
-        [1, 2, 3, 4, 5].forEach(id => {
-          msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
-        });
-        document.getElementById('step-msg').textContent = '⏭ Step 2: Messages';
-        currentStep = 1;
-      } else if (currentStep === 1) {
-        // Step 2: Messages flow
-        updateStatusPanel(2);
-        document.getElementById('msg-formula').style.display = 'block';
-        ['e1', 'e2', 'e3', 'e4', 'e5'].forEach(edgeId => {
-          msgEdges.update({ 
-            id: edgeId, 
-            color: { color: '#667eea' }, 
-            width: 4,
-            label: 'msg',
-            arrows: { to: { enabled: true, scaleFactor: 0.8 } }
+      // Execute current step and advance
+      const stepActions = {
+        0: () => {
+          // Step 1: Highlight neighbors
+          updateStatusPanel(1);
+          [1, 2, 3, 4, 5].forEach(id => {
+            if (msgNodes) {
+              msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
+            }
           });
-        });
-        document.getElementById('step-msg').textContent = '⏭ Step 3: Normalize';
-        currentStep = 2;
-      } else if (currentStep === 2) {
-        // Step 3: Normalize
-        updateStatusPanel(3);
-        document.getElementById('step-msg').textContent = '⏭ Step 4: Aggregate';
-        currentStep = 3;
-      } else if (currentStep === 3) {
-        // Step 4: Aggregate
-        updateStatusPanel(4);
-        msgNodes.update({ 
-          id: 0, 
-          color: { background: '#9c27b0', border: '#6a1b9a' },
-          label: 'P0\nAggregating...',
-          font: { color: '#ffffff' }
-        });
-        document.getElementById('step-msg').textContent = '⏭ Step 5: Activate';
-        currentStep = 4;
-      } else if (currentStep === 4) {
-        // Step 5: Activation
-        updateStatusPanel(5);
-        msgNodes.update({ 
-          id: 0, 
-          color: { background: '#4caf50', border: '#2e7d32' },
-          label: 'P0\n[0.48, 0.52, 0.44]',
-          title: 'Updated Features\n[0.48, 0.52, 0.44]',
-          font: { color: '#000000' }
-        });
-        document.getElementById('step-msg').textContent = '🔄 Reset';
-        currentStep = 5;
-      } else {
+          const stepBtn = document.getElementById('step-msg');
+          if (stepBtn) stepBtn.textContent = '⏭ Step 2: Messages';
+        },
+        1: () => {
+          // Step 2: Messages flow
+          updateStatusPanel(2);
+          const formulaDiv = document.getElementById('msg-formula');
+          if (formulaDiv) formulaDiv.style.display = 'block';
+          
+          // Update edges by ID
+          if (msgEdges) {
+            ['e1', 'e2', 'e3', 'e4', 'e5'].forEach(edgeId => {
+              msgEdges.update({ 
+                id: edgeId, 
+                color: { color: '#667eea' }, 
+                width: 4,
+                label: 'msg',
+                arrows: { to: { enabled: true, scaleFactor: 0.8 } }
+              });
+            });
+          }
+          
+          const stepBtn = document.getElementById('step-msg');
+          if (stepBtn) stepBtn.textContent = '⏭ Step 3: Normalize';
+        },
+        2: () => {
+          // Step 3: Normalize
+          updateStatusPanel(3);
+          const stepBtn = document.getElementById('step-msg');
+          if (stepBtn) stepBtn.textContent = '⏭ Step 4: Aggregate';
+        },
+        3: () => {
+          // Step 4: Aggregate
+          updateStatusPanel(4);
+          if (msgNodes) {
+            msgNodes.update({ 
+              id: 0, 
+              color: { background: '#9c27b0', border: '#6a1b9a' },
+              label: 'P0\nAggregating...',
+              font: { color: '#ffffff' }
+            });
+          }
+          const stepBtn = document.getElementById('step-msg');
+          if (stepBtn) stepBtn.textContent = '⏭ Step 5: Activate';
+        },
+        4: () => {
+          // Step 5: Activation
+          updateStatusPanel(5);
+          if (msgNodes) {
+            msgNodes.update({ 
+              id: 0, 
+              color: { background: '#4caf50', border: '#2e7d32' },
+              label: 'P0\n[0.48, 0.52, 0.44]',
+              title: 'Updated Features\n[0.48, 0.52, 0.44]',
+              font: { color: '#000000' }
+            });
+          }
+          const stepBtn = document.getElementById('step-msg');
+          if (stepBtn) stepBtn.textContent = '🔄 Reset';
+        }
+      };
+      
+      // Execute current step and increment
+      if (currentStep < 5 && stepActions[currentStep]) {
+        try {
+          stepActions[currentStep]();
+          currentStep++;
+        } catch (error) {
+          console.error('Error executing step', currentStep, error);
+        }
+      } else if (currentStep >= 5) {
         // Reset after all steps
         resetMessagePassing();
       }
