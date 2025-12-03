@@ -344,13 +344,31 @@ At its core, a GCN allows each node to **aggregate information from its neighbor
 
 ### Interactive: Message Passing in Action
 
-Explore how message passing works in this interactive visualization. **Click on the central node** to see how it aggregates information from its neighbors. You can drag nodes to rearrange them and see how the aggregation process works.
+Explore how message passing works in this detailed interactive visualization. Watch how a central protein **aggregates feature information** from its neighboring proteins to create an updated representation.
 
-<div id="message-passing-demo" style="height: 450px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0; background: white;"></div>
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+  <div id="message-passing-demo" style="height: 500px; border-radius: 10px; border: 2px solid #667eea; background: white; position: relative;"></div>
+  
+  <div id="msg-status-panel" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 10px; padding: 1.5rem; border: 2px solid #667eea; height: 500px; overflow-y: auto;">
+    <h4 style="margin-top: 0; color: #667eea; font-size: 1.1rem;">📊 Message Passing Steps</h4>
+    <div id="msg-status-text" style="font-size: 0.95rem; line-height: 1.6; color: #333;">
+      <p><strong>Step 0: Initial State</strong></p>
+      <p>Each protein has initial features (biological descriptors). Click the central node or use "Start Animation" to begin message passing.</p>
+      <hr style="border: none; border-top: 1px solid rgba(102, 126, 234, 0.3); margin: 1rem 0;">
+      <div id="msg-formula" style="background: rgba(255, 255, 255, 0.7); padding: 1rem; border-radius: 5px; margin-top: 1rem; display: none;">
+        <strong>Formula:</strong>
+        <div style="font-size: 0.85rem; margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace;">
+          <div>h'<sub>i</sub> = σ(Σ<sub>j∈N(i)</sub> W·h<sub>j</sub> / √(d<sub>i</sub>·d<sub>j</sub>))</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<div style="text-align: center; margin-bottom: 1rem;">
-  <button id="reset-msg" style="padding: 0.5rem 1rem; margin: 0.25rem; border-radius: 5px; background: #667eea; color: white; border: none; cursor: pointer;">Reset Animation</button>
-  <button id="step-msg" style="padding: 0.5rem 1rem; margin: 0.25rem; border-radius: 5px; background: #764ba2; color: white; border: none; cursor: pointer;">Step Through</button>
+<div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;">
+  <button id="start-msg" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); transition: transform 0.2s;">▶ Start Animation</button>
+  <button id="reset-msg" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: #f093fb; color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4); transition: transform 0.2s;">🔄 Reset</button>
+  <button id="step-msg" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: #4facfe; color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4); transition: transform 0.2s;">⏭ Next Step</button>
 </div>
 
 <script type="text/javascript">
@@ -359,28 +377,174 @@ Explore how message passing works in this interactive visualization. **Click on 
     let msgNodes = null;
     let msgEdges = null;
     let currentStep = 0;
+    let isAnimating = false;
+    
+    // Feature vectors for each protein (simplified 3D for visualization)
+    const nodeFeatures = {
+      0: [0.5, 0.3, 0.8],  // Central protein
+      1: [0.7, 0.2, 0.1],  // Neighbor 1 - Immune function
+      2: [0.2, 0.9, 0.3],  // Neighbor 2 - Metabolic function
+      3: [0.4, 0.6, 0.5],  // Neighbor 3 - Transport function
+      4: [0.8, 0.4, 0.2],  // Neighbor 4 - Signal function
+      5: [0.3, 0.7, 0.6]   // Neighbor 5 - Structural function
+    };
+    
+    const nodeFunctions = {
+      0: 'Unknown',
+      1: 'Immune Response',
+      2: 'Metabolism',
+      3: 'Transport',
+      4: 'Signaling',
+      5: 'Structure'
+    };
+
+    function updateStatusPanel(step, details) {
+      const statusText = document.getElementById('msg-status-text');
+      const formulaDiv = document.getElementById('msg-formula');
+      
+      const steps = {
+        0: {
+          title: 'Step 0: Initial State',
+          content: `
+            <p><strong>Each protein has initial features:</strong></p>
+            <ul style="font-size: 0.9rem; margin: 0.5rem 0;">
+              <li><strong>Protein 0 (Central):</strong> Features: [${nodeFeatures[0].map(f => f.toFixed(2)).join(', ')}]</li>
+              <li><strong>Neighbor 1:</strong> Features: [${nodeFeatures[1].map(f => f.toFixed(2)).join(', ')}] - ${nodeFunctions[1]}</li>
+              <li><strong>Neighbor 2:</strong> Features: [${nodeFeatures[2].map(f => f.toFixed(2)).join(', ')}] - ${nodeFunctions[2]}</li>
+              <li><strong>Neighbor 3:</strong> Features: [${nodeFeatures[3].map(f => f.toFixed(2)).join(', ')}] - ${nodeFunctions[3]}</li>
+              <li><strong>Neighbor 4:</strong> Features: [${nodeFeatures[4].map(f => f.toFixed(2)).join(', ')}] - ${nodeFunctions[4]}</li>
+              <li><strong>Neighbor 5:</strong> Features: [${nodeFeatures[5].map(f => f.toFixed(2)).join(', ')}] - ${nodeFunctions[5]}</li>
+            </ul>
+            <p style="margin-top: 1rem;">Click "Start Animation" to see how the central protein aggregates information from its neighbors.</p>
+          `
+        },
+        1: {
+          title: 'Step 1: Identify Neighbors',
+          content: `
+            <p><strong>Neighbors are identified:</strong></p>
+            <p>The central protein (Protein 0) has <strong>5 neighboring proteins</strong> connected by edges in the interaction network.</p>
+            <p style="color: #ff9800;">✨ Neighbors are highlighted in orange.</p>
+          `
+        },
+        2: {
+          title: 'Step 2: Compute Messages',
+          content: `
+            <p><strong>Each neighbor prepares a message:</strong></p>
+            <p>Messages are computed using the neighbor's features multiplied by learned weights:</p>
+            <div style="background: rgba(255, 255, 255, 0.6); padding: 0.75rem; border-radius: 5px; margin: 0.5rem 0; font-size: 0.85rem;">
+              message<sub>j</sub> = W · h<sub>j</sub>
+            </div>
+            <p style="color: #667eea;">💫 Messages flow along edges (highlighted in blue).</p>
+          `
+        },
+        3: {
+          title: 'Step 3: Normalize Messages',
+          content: `
+            <p><strong>Apply symmetric normalization:</strong></p>
+            <p>To prevent nodes with many neighbors from dominating, we normalize by degrees:</p>
+            <div style="background: rgba(255, 255, 255, 0.6); padding: 0.75rem; border-radius: 5px; margin: 0.5rem 0; font-size: 0.85rem;">
+              normalized_msg = message / √(d<sub>central</sub> · d<sub>neighbor</sub>)
+            </div>
+            <p>Central node degree: 5, Neighbor degree: 1</p>
+          `
+        },
+        4: {
+          title: 'Step 4: Aggregate Messages',
+          content: `
+            <p><strong>Sum all normalized messages:</strong></p>
+            <p>The central node aggregates (sums) all incoming messages:</p>
+            <div style="background: rgba(255, 255, 255, 0.6); padding: 0.75rem; border-radius: 5px; margin: 0.5rem 0; font-size: 0.85rem;">
+              h'<sub>0</sub> = Σ<sub>j=1 to 5</sub> normalized_msg<sub>j</sub>
+            </div>
+            <p style="color: #4caf50;">✅ Aggregation complete!</p>
+          `
+        },
+        5: {
+          title: 'Step 5: Apply Activation',
+          content: `
+            <p><strong>Apply ReLU activation function:</strong></p>
+            <div style="background: rgba(255, 255, 255, 0.6); padding: 0.75rem; border-radius: 5px; margin: 0.5rem 0; font-size: 0.85rem;">
+              h'<sub>final</sub> = ReLU(h'<sub>0</sub>)
+            </div>
+            <p>The central protein now has an <strong>updated representation</strong> that incorporates information from all its neighbors!</p>
+            <p style="color: #4caf50; font-weight: bold;">🎉 Message passing complete!</p>
+          `
+        }
+      };
+      
+      if (steps[step]) {
+        statusText.innerHTML = `<p><strong>${steps[step].title}</strong></p>${steps[step].content}`;
+        if (step >= 2) {
+          formulaDiv.style.display = 'block';
+        } else {
+          formulaDiv.style.display = 'none';
+        }
+      }
+    }
 
     function initMessagePassing() {
       const container = document.getElementById('message-passing-demo');
       if (!container || typeof vis === 'undefined') return;
 
-      // Create nodes - central protein with neighbors
+      // Create nodes with feature labels
       msgNodes = new vis.DataSet([
-        { id: 0, label: 'Protein 0\n(Central)', x: 0, y: 0, color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#000000', size: 16 }, fixed: false },
-        { id: 1, label: 'Neighbor 1', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
-        { id: 2, label: 'Neighbor 2', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
-        { id: 3, label: 'Neighbor 3', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
-        { id: 4, label: 'Neighbor 4', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
-        { id: 5, label: 'Neighbor 5', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } }
+        { 
+          id: 0, 
+          label: 'P0\n[0.50, 0.30, 0.80]', 
+          title: 'Central Protein\nFeatures: [0.50, 0.30, 0.80]',
+          color: { background: '#667eea', border: '#4c51bf' }, 
+          font: { color: '#000000', size: 12 },
+          size: 30
+        },
+        { 
+          id: 1, 
+          label: 'P1\n[0.70, 0.20, 0.10]', 
+          title: 'Neighbor 1 - Immune Response\nFeatures: [0.70, 0.20, 0.10]',
+          color: { background: '#f093fb', border: '#ea580c' }, 
+          font: { color: '#000000', size: 11 },
+          size: 24
+        },
+        { 
+          id: 2, 
+          label: 'P2\n[0.20, 0.90, 0.30]', 
+          title: 'Neighbor 2 - Metabolism\nFeatures: [0.20, 0.90, 0.30]',
+          color: { background: '#f093fb', border: '#ea580c' }, 
+          font: { color: '#000000', size: 11 },
+          size: 24
+        },
+        { 
+          id: 3, 
+          label: 'P3\n[0.40, 0.60, 0.50]', 
+          title: 'Neighbor 3 - Transport\nFeatures: [0.40, 0.60, 0.50]',
+          color: { background: '#f093fb', border: '#ea580c' }, 
+          font: { color: '#000000', size: 11 },
+          size: 24
+        },
+        { 
+          id: 4, 
+          label: 'P4\n[0.80, 0.40, 0.20]', 
+          title: 'Neighbor 4 - Signaling\nFeatures: [0.80, 0.40, 0.20]',
+          color: { background: '#f093fb', border: '#ea580c' }, 
+          font: { color: '#000000', size: 11 },
+          size: 24
+        },
+        { 
+          id: 5, 
+          label: 'P5\n[0.30, 0.70, 0.60]', 
+          title: 'Neighbor 5 - Structure\nFeatures: [0.30, 0.70, 0.60]',
+          color: { background: '#f093fb', border: '#ea580c' }, 
+          font: { color: '#000000', size: 11 },
+          size: 24
+        }
       ]);
 
-      // Create edges - connections to central node
+      // Create edges with labels
       msgEdges = new vis.DataSet([
-        { from: 1, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
-        { from: 2, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
-        { from: 3, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
-        { from: 4, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
-        { from: 5, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } }
+        { id: 'e1', from: 1, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' }, label: '', arrows: { to: { enabled: false } } },
+        { id: 'e2', from: 2, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' }, label: '', arrows: { to: { enabled: false } } },
+        { id: 'e3', from: 3, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' }, label: '', arrows: { to: { enabled: false } } },
+        { id: 'e4', from: 4, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' }, label: '', arrows: { to: { enabled: false } } },
+        { id: 'e5', from: 5, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' }, label: '', arrows: { to: { enabled: false } } }
       ]);
 
       const data = { nodes: msgNodes, edges: msgEdges };
@@ -392,92 +556,149 @@ Explore how message passing works in this interactive visualization. **Click on 
         interaction: {
           zoomView: false,
           dragView: true,
-          dragNodes: true
+          dragNodes: true,
+          tooltipDelay: 100
         },
         nodes: {
           shape: 'dot',
-          size: 25,
-          font: { size: 14, color: '#000000' }
+          font: { color: '#000000' },
+          borderWidth: 2
         },
         edges: {
-          arrows: { to: { enabled: false } },
-          smooth: { type: 'continuous', roundness: 0.5 }
-        },
-        layout: {
-          hierarchical: {
-            enabled: false
-          }
+          smooth: { type: 'continuous', roundness: 0.5 },
+          font: { color: '#333', size: 10, align: 'middle' },
+          labelHighlightBold: false
         }
       };
 
       msgNetwork = new vis.Network(container, data, options);
-
-      // Animation: Highlight edges and nodes during message passing
+      
+      // Click handler for central node
       msgNetwork.on('click', function(params) {
-        if (params.nodes.length > 0 && params.nodes[0] === 0) {
-          animateMessagePassing();
+        if (!isAnimating && params.nodes.length > 0 && params.nodes[0] === 0) {
+          startFullAnimation();
         }
       });
 
-      // Reset button
+      // Button handlers
+      document.getElementById('start-msg')?.addEventListener('click', startFullAnimation);
       document.getElementById('reset-msg')?.addEventListener('click', resetMessagePassing);
       document.getElementById('step-msg')?.addEventListener('click', stepMessagePassing);
+      
+      updateStatusPanel(0);
     }
 
-    function animateMessagePassing() {
+    function startFullAnimation() {
+      if (isAnimating) return;
+      isAnimating = true;
+      currentStep = 0;
+      
       // Step 1: Highlight neighbors
-      [1, 2, 3, 4, 5].forEach(id => {
-        msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
+      updateStatusPanel(1);
+      [1, 2, 3, 4, 5].forEach((id, idx) => {
+        setTimeout(() => {
+          msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
+        }, idx * 150);
       });
       
       setTimeout(() => {
-        // Step 2: Show message flow (highlight edges)
-        msgEdges.forEach(edge => {
-          if (edge.to === 0) {
-            msgEdges.update({ ...edge, color: { color: '#667eea' }, width: 4 });
-          }
+        // Step 2: Messages flow
+        updateStatusPanel(2);
+        document.getElementById('msg-formula').style.display = 'block';
+        msgEdges.forEach((edge, idx) => {
+          setTimeout(() => {
+            msgEdges.update({ 
+              id: edge.id, 
+              color: { color: '#667eea', highlight: '#667eea' }, 
+              width: 4,
+              label: 'msg',
+              arrows: { to: { enabled: true, scaleFactor: 0.8, type: 'arrow' } }
+            });
+          }, idx * 200);
         });
         
         setTimeout(() => {
-          // Step 3: Update central node (aggregation complete)
-          msgNodes.update({ 
-            id: 0, 
-            color: { background: '#4caf50', border: '#2e7d32' },
-            label: 'Protein 0\n(Aggregated!)',
-            font: { color: '#000000' }
-          });
+          // Step 3: Normalize
+          updateStatusPanel(3);
           
           setTimeout(() => {
-            resetMessagePassing();
-          }, 2000);
-        }, 800);
-      }, 800);
+            // Step 4: Aggregate
+            updateStatusPanel(4);
+            msgNodes.update({ 
+              id: 0, 
+              color: { background: '#9c27b0', border: '#6a1b9a' },
+              label: 'P0\nAggregating...',
+              font: { color: '#ffffff' }
+            });
+            
+            setTimeout(() => {
+              // Step 5: Activation
+              updateStatusPanel(5);
+              msgNodes.update({ 
+                id: 0, 
+                color: { background: '#4caf50', border: '#2e7d32' },
+                label: 'P0\n[0.48, 0.52, 0.44]',
+                title: 'Updated Features\n[0.48, 0.52, 0.44]',
+                font: { color: '#000000' }
+              });
+              
+              setTimeout(() => {
+                isAnimating = false;
+              }, 2000);
+            }, 1000);
+          }, 800);
+        }, 1200);
+      }, 1000);
     }
 
     function stepMessagePassing() {
+      if (isAnimating) return;
+      
       const steps = [
         () => {
+          updateStatusPanel(1);
           [1, 2, 3, 4, 5].forEach(id => {
             msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
           });
-          document.getElementById('step-msg').textContent = 'Step 2: Messages Flow';
+          document.getElementById('step-msg').textContent = '⏭ Step 2: Messages';
         },
         () => {
+          updateStatusPanel(2);
+          document.getElementById('msg-formula').style.display = 'block';
           msgEdges.forEach(edge => {
-            if (edge.to === 0) {
-              msgEdges.update({ ...edge, color: { color: '#667eea' }, width: 4 });
-            }
+            msgEdges.update({ 
+              id: edge.id, 
+              color: { color: '#667eea' }, 
+              width: 4,
+              label: 'msg',
+              arrows: { to: { enabled: true, scaleFactor: 0.8 } }
+            });
           });
-          document.getElementById('step-msg').textContent = 'Step 3: Aggregate';
+          document.getElementById('step-msg').textContent = '⏭ Step 3: Normalize';
         },
         () => {
+          updateStatusPanel(3);
+          document.getElementById('step-msg').textContent = '⏭ Step 4: Aggregate';
+        },
+        () => {
+          updateStatusPanel(4);
+          msgNodes.update({ 
+            id: 0, 
+            color: { background: '#9c27b0', border: '#6a1b9a' },
+            label: 'P0\nAggregating...',
+            font: { color: '#ffffff' }
+          });
+          document.getElementById('step-msg').textContent = '⏭ Step 5: Activate';
+        },
+        () => {
+          updateStatusPanel(5);
           msgNodes.update({ 
             id: 0, 
             color: { background: '#4caf50', border: '#2e7d32' },
-            label: 'Protein 0\n(Aggregated!)',
+            label: 'P0\n[0.48, 0.52, 0.44]',
             font: { color: '#000000' }
           });
-          document.getElementById('step-msg').textContent = 'Reset';
+          document.getElementById('step-msg').textContent = '🔄 Reset';
         }
       ];
       
@@ -490,27 +711,43 @@ Explore how message passing works in this interactive visualization. **Click on 
     }
 
     function resetMessagePassing() {
+      isAnimating = false;
       currentStep = 0;
       msgNodes.update([
-        { id: 0, label: 'Protein 0\n(Central)', color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#000000' } },
-        { id: 1, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
-        { id: 2, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
-        { id: 3, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
-        { id: 4, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
-        { id: 5, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } }
+        { id: 0, label: 'P0\n[0.50, 0.30, 0.80]', color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#000000' } },
+        { id: 1, label: 'P1\n[0.70, 0.20, 0.10]', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 2, label: 'P2\n[0.20, 0.90, 0.30]', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 3, label: 'P3\n[0.40, 0.60, 0.50]', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 4, label: 'P4\n[0.80, 0.40, 0.20]', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 5, label: 'P5\n[0.30, 0.70, 0.60]', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } }
       ]);
       msgEdges.forEach(edge => {
-        msgEdges.update({ ...edge, color: { color: '#888' }, width: 2 });
+        msgEdges.update({ 
+          id: edge.id, 
+          color: { color: '#888' }, 
+          width: 2,
+          label: '',
+          arrows: { to: { enabled: false } }
+        });
       });
-      document.getElementById('step-msg').textContent = 'Step Through';
+      document.getElementById('step-msg').textContent = '⏭ Next Step';
+      document.getElementById('msg-formula').style.display = 'none';
+      updateStatusPanel(0);
     }
 
     // Initialize when page loads
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initMessagePassing);
-    } else {
-      initMessagePassing();
+    function tryInit() {
+      if (typeof vis !== 'undefined') {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initMessagePassing);
+        } else {
+          initMessagePassing();
+        }
+      } else {
+        setTimeout(tryInit, 100);
+      }
     }
+    tryInit();
   }
 </script>
 
