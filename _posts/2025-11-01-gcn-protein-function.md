@@ -25,8 +25,8 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
 
 <div class="toc-buttons">
   <a class="toc-button" href="#graph-basics">Graph Basics</a>
+  <a class="toc-button" href="#pytorch-geometric-basics">Working with PyTorch Geometric</a>
   <a class="toc-button" href="#understanding-the-problem">Understanding the Problem</a>
-  <a class="toc-button" href="#what-makes-graphs-different">What Makes Graphs Different?</a>
   <a class="toc-button" href="#exploring-the-dataset">Exploring the Dataset</a>
   <a class="toc-button" href="#graph-convolutional-networks-the-core-idea">GCN: The Core Idea</a>
   <a class="toc-button" href="#building-our-gcn-architecture">Building the GCN</a>
@@ -183,9 +183,43 @@ Explore four tiny graphs below—undirected, directed, weighted, and bipartite. 
   }
 </script>
 
+Now that we understand what graphs are, let's see how they differ from traditional tensor-based data structures in PyTorch and how PyTorch Geometric makes working with them practical.
+
 ---
 
-## Understanding the Problem
+## Working with Graphs in PyTorch Geometric {#pytorch-geometric-basics}
+
+If you're coming from standard PyTorch, you're used to tensors with fixed shapes like `(batch_size, channels, height, width)` for images. **Graphs break this assumption.** Let's explore the key differences and how PyTorch Geometric handles them.
+
+### Key Differences from Images
+
+1. **Variable Structure:** Each graph has a different number of nodes and edges—you can't batch them like images
+2. **Sparse Connectivity:** Most proteins don't interact with most others (sparse adjacency matrix)
+3. **No Spatial Locality:** Unlike pixels, nodes have no inherent grid structure
+
+### How PyTorch Geometric Handles This
+
+PyG introduces two key tensors that efficiently represent graph-structured data:
+
+```python
+# Node feature matrix: [Num_Nodes, Num_Features]
+x = torch.tensor([[0.5, 0.2, ...],  # Node 0 features
+                  [0.1, 0.9, ...],  # Node 1 features
+                  ...])
+
+# Edge connectivity: [2, Num_Edges] 
+# First row: source nodes, Second row: destination nodes
+edge_index = torch.tensor([[0, 1, 2, ...],  # Source nodes
+                           [1, 0, 3, ...]])  # Destination nodes
+```
+
+The `edge_index` format is more efficient than a full adjacency matrix for sparse graphs. Instead of storing an \( N \times N \) matrix where most entries are zero, we only store the edges that actually exist.
+
+Now that we know how graphs work and how to represent them in PyTorch, let's dive into our specific problem: predicting protein functions from their interaction networks.
+
+---
+
+## Understanding the Problem {#understanding-the-problem}
 
 ### Problem Formulation
 
@@ -208,35 +242,7 @@ Unlike standard classification (e.g., "this image is a cat"), a protein can have
 
 This means we need to predict 121 independent binary classifications per protein.
 
----
-
-## What Makes Graphs Different?
-
-If you're coming from standard PyTorch, you're used to tensors with fixed shapes like `(batch_size, channels, height, width)` for images. **Graphs break this assumption.**
-
-### Key Differences from Images
-
-1. **Variable Structure:** Each graph has a different number of nodes and edges—you can't batch them like images
-2. **Sparse Connectivity:** Most proteins don't interact with most others (sparse adjacency matrix)
-3. **No Spatial Locality:** Unlike pixels, nodes have no inherent grid structure
-
-### How PyTorch Geometric Handles This
-
-PyG introduces two key tensors:
-
-```python
-# Node feature matrix: [Num_Nodes, Num_Features]
-x = torch.tensor([[0.5, 0.2, ...],  # Node 0 features
-                  [0.1, 0.9, ...],  # Node 1 features
-                  ...])
-
-# Edge connectivity: [2, Num_Edges] 
-# First row: source nodes, Second row: destination nodes
-edge_index = torch.tensor([[0, 1, 2, ...],  # Source nodes
-                           [1, 0, 3, ...]])  # Destination nodes
-```
-
-The `edge_index` format is more efficient than a full adjacency matrix for sparse graphs.
+Perfect! Now that we've formulated the problem, let's explore the dataset we'll use to solve it.
 
 ---
 
@@ -317,6 +323,8 @@ Understanding the distribution of protein functions helps us interpret model per
 ![Class Distribution]({{ site.baseurl }}/assets/class_dist.png)
 
 The class distribution shows that protein functions are **highly imbalanced**—some functions are common (appear in many proteins) while others are rare. This is typical in biological datasets and something we need to account for in our evaluation metrics. We'll use micro-averaged F1 score to handle this imbalance.
+
+Now that we understand our data, let's build a Graph Convolutional Network to learn from these protein interactions and predict functions.
 
 ---
 
@@ -416,9 +424,15 @@ class GCN(torch.nn.Module):
 3. **Dropout (p=0.5):** Prevents overfitting, especially important with limited training graphs
 4. **No activation on output:** We'll use BCEWithLogitsLoss which applies sigmoid internally
 
+Now that we have our architecture defined, let's train it and see how it performs!
+
+---
+
+## Training and Evaluation
+
 ### The Loss Function: Binary Cross Entropy
 
-Since this is multi-label classification, we use **Binary Cross Entropy with Logits Loss**:
+Since this is multi-label classification, we need a loss function that handles multiple independent binary predictions. We use **Binary Cross Entropy with Logits Loss**:
 
 {::nomarkdown}
 \[
@@ -432,10 +446,6 @@ Each of the 121 classes is treated as an **independent binary classification pro
 ```python
 criterion = torch.nn.BCEWithLogitsLoss()  # Applies sigmoid internally
 ```
-
----
-
-## Training and Evaluation
 
 ### Training Loop
 
@@ -541,6 +551,8 @@ for depth in configs:
 ```
 
 ### Why Micro-Averaged F1 Score?
+
+When evaluating multi-label classification, choosing the right metric is crucial:
 
 For multi-label classification, we use **micro-averaged F1** because:
 - It treats each label prediction as an individual binary classification
