@@ -1,5 +1,8 @@
 ---
+# Jekyll front matter - makes this file processable by Jekyll
 ---
 
-@import "custom";
+@import "minima";
 
+// Import custom styles
+@import "custom";

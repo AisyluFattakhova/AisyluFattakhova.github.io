@@ -1,0 +1,219 @@
+/* Custom styling for beautiful blog design - Override minima theme */
+
+/* Beautiful gradient background - Use !important to override theme */
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%) !important;
+  background-attachment: fixed !important;
+  background-size: 400% 400% !important;
+  animation: gradientShift 15s ease infinite !important;
+  min-height: 100vh !important;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Content wrapper with beautiful frame */
+.wrapper {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+  margin: 2rem auto !important;
+  max-width: 1200px !important;
+  padding: 3rem !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Site header styling */
+.site-header {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 15px !important;
+  padding: 1.5rem !important;
+  margin-bottom: 2rem !important;
+  border: 2px solid rgba(102, 126, 234, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Post content styling with frames */
+.post-content {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-radius: 15px !important;
+  padding: 2.5rem !important;
+  margin: 2rem 0 !important;
+  border-left: 5px solid #667eea !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Section frames - Override theme heading styles */
+.post-content h2 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 10px !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.post-content h3 {
+  background: linear-gradient(135deg, #f093fb 0%, #4facfe 100%) !important;
+  color: white !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 8px !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 3px 10px rgba(240, 147, 251, 0.3) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Code blocks with beautiful frames */
+.highlight {
+  background: #1e1e1e !important;
+  border-radius: 10px !important;
+  padding: 1.5rem !important;
+  margin: 1.5rem 0 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  border: 2px solid #667eea !important;
+  overflow-x: auto !important;
+}
+
+pre {
+  background: #1e1e1e !important;
+  border-radius: 10px !important;
+  padding: 1.5rem !important;
+  margin: 1.5rem 0 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  border: 2px solid #667eea !important;
+  overflow-x: auto !important;
+}
+
+code {
+  background: rgba(102, 126, 234, 0.1) !important;
+  padding: 0.2rem 0.5rem !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(102, 126, 234, 0.3) !important;
+}
+
+.highlight code {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Beautiful blockquotes */
+blockquote {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
+  border-left: 5px solid #667eea !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  margin: 1.5rem 0 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  font-style: italic !important;
+}
+
+/* Image frames */
+.post-content img {
+  border-radius: 15px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+  border: 3px solid rgba(255, 255, 255, 0.8) !important;
+  margin: 1.5rem auto !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+/* Lists with styling */
+.post-content ul,
+.post-content ol {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem 1.5rem 1.5rem 2.5rem !important;
+  margin: 1rem 0 !important;
+  border-left: 4px solid #764ba2 !important;
+}
+
+/* Math formula styling */
+.MathJax {
+  color: #2c3e50 !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  padding: 0.5rem !important;
+  border-radius: 5px !important;
+  display: inline-block !important;
+  margin: 0.5rem 0 !important;
+}
+
+/* Math display blocks */
+.MathJax_Display {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 10px !important;
+  padding: 1.5rem !important;
+  margin: 2rem 0 !important;
+  border: 2px solid #667eea !important;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1) !important;
+  text-align: center !important;
+}
+
+/* Table of contents styling */
+.post-content > ul:first-of-type {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%) !important;
+  border: 2px solid rgba(102, 126, 234, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 2rem !important;
+  margin: 2rem 0 !important;
+}
+
+/* Links */
+a {
+  color: #667eea !important;
+  text-decoration: none !important;
+  border-bottom: 2px solid transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+a:hover {
+  color: #764ba2 !important;
+  border-bottom: 2px solid #764ba2 !important;
+}
+
+/* Footer */
+.site-footer {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 15px !important;
+  padding: 2rem !important;
+  margin-top: 3rem !important;
+  border: 2px solid rgba(102, 126, 234, 0.3) !important;
+  text-align: center !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .wrapper {
+    margin: 1rem !important;
+    padding: 1.5rem !important;
+  }
+  
+  .post-content {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Paragraph spacing */
+.post-content p {
+  margin: 1.2rem 0 !important;
+  line-height: 1.8 !important;
+}
+
+/* Horizontal rules */
+.post-content hr {
+  border: none !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, transparent, #667eea, transparent) !important;
+  margin: 3rem 0 !important;
+  border-radius: 2px !important;
+}
+

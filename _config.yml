@@ -1,9 +1,9 @@
 # Site Settings
-title: Aisyu Fattakhova - Graph Neural Networks Blog
+title: Graph Neural Networks Blog
 description: Deep learning blog focusing on Graph Neural Networks, PyTorch Geometric, and protein function prediction
 url: https://AisyluFattakhova.github.io
 baseurl: ""
-author: Aisyu Fattakhova
+author: Aisylu Fattakhova, Azalia Alisheva
 
 # Build Settings
 theme: minima
