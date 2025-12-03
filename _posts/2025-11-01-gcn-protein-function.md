@@ -347,13 +347,13 @@ At its core, a GCN allows each node to **aggregate information from its neighbor
 Explore how message passing works in this detailed interactive visualization. Watch how a central protein **aggregates feature information** from its neighboring proteins to create an updated representation.
 
 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin: 1.5rem 0;">
-  <div id="message-passing-demo" style="height: 500px; border-radius: 10px; border: 2px solid #667eea; background: white; position: relative;"></div>
+  <div id="message-passing-demo" style="height: 500px; border-radius: 10px; border: 2px solid #667eea; background: white; position: relative; box-sizing: border-box;"></div>
   
-  <div id="msg-status-panel" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 10px; padding: 1.5rem; border: 2px solid #667eea; height: 500px; overflow-y: auto;">
+  <div id="msg-status-panel" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 10px; padding: 1.5rem; border: 2px solid #667eea; height: 500px; overflow-y: auto; box-sizing: border-box;">
     <h4 style="margin-top: 0; color: #667eea; font-size: 1.1rem;">📊 Message Passing Steps</h4>
     <div id="msg-status-text" style="font-size: 0.95rem; line-height: 1.6; color: #333;">
       <p><strong>Step 0: Initial State</strong></p>
-      <p>Each protein has initial features (biological descriptors). Click the central node or use "Start Animation" to begin message passing.</p>
+      <p>Each protein has initial features (biological descriptors). Use "Next Step" to manually progress through the message passing process.</p>
       <hr style="border: none; border-top: 1px solid rgba(102, 126, 234, 0.3); margin: 1rem 0;">
       <div id="msg-formula" style="background: rgba(255, 255, 255, 0.7); padding: 1rem; border-radius: 5px; margin-top: 1rem; display: none;">
         <strong>Formula:</strong>
@@ -366,7 +366,6 @@ Explore how message passing works in this detailed interactive visualization. Wa
 </div>
 
 <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;">
-  <button id="start-msg" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); transition: transform 0.2s;">▶ Start Animation</button>
   <button id="reset-msg" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: #f093fb; color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4); transition: transform 0.2s;">🔄 Reset</button>
   <button id="step-msg" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: #4facfe; color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4); transition: transform 0.2s;">⏭ Next Step</button>
 </div>
@@ -420,7 +419,7 @@ Explore how message passing works in this detailed interactive visualization. Wa
               <li><strong>Neighbor 4:</strong> Features: [${nodeFeatures[4].map(f => f.toFixed(2)).join(', ')}] - ${nodeFunctions[4]}</li>
               <li><strong>Neighbor 5:</strong> Features: [${nodeFeatures[5].map(f => f.toFixed(2)).join(', ')}] - ${nodeFunctions[5]}</li>
             </ul>
-            <p style="margin-top: 1rem;">Click "Start Animation" to see how the central protein aggregates information from its neighbors.</p>
+            <p style="margin-top: 1rem;">Use "Next Step" to manually progress through each step of the message passing process.</p>
           `
         },
         1: {
@@ -582,15 +581,7 @@ Explore how message passing works in this detailed interactive visualization. Wa
 
       msgNetwork = new vis.Network(container, data, options);
       
-      // Click handler for central node
-      msgNetwork.on('click', function(params) {
-        if (!isAnimating && params.nodes.length > 0 && params.nodes[0] === 0) {
-          startFullAnimation();
-        }
-      });
-
       // Button handlers
-      document.getElementById('start-msg')?.addEventListener('click', startFullAnimation);
       document.getElementById('reset-msg')?.addEventListener('click', resetMessagePassing);
       document.getElementById('step-msg')?.addEventListener('click', stepMessagePassing);
       
