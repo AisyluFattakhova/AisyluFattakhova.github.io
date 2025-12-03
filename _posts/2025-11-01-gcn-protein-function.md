@@ -44,9 +44,9 @@ We formulate protein function prediction as a **multi-label node classification*
   - \( V \) = Set of proteins (nodes)
   - \( E \) = Set of physical interactions between proteins (edges)
 
-- **Input:** Node features \( X \in \mathbb{R}^{N \times 50} \) (50 biological descriptors per protein)
+- **Input:** Node features {::nomarkdown}\( X \in \mathbb{R}^{N \times 50} \){:/} (50 biological descriptors per protein)
 
-- **Output:** Multi-label predictions \( Y \in \{0,1\}^{N \times 121} \) (121 Gene Ontology terms)
+- **Output:** Multi-label predictions {::nomarkdown}\( Y \in \{0,1\}^{N \times 121} \){:/} (121 Gene Ontology terms)
 
 ### Why Multi-Label Classification?
 
