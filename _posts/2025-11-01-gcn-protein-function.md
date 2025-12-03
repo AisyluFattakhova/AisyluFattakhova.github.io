@@ -208,92 +208,11 @@ Unlike standard classification (e.g., "this image is a cat"), a protein can have
 
 This means we need to predict 121 independent binary classifications per protein.
 
-### The Dataset: Protein-Protein Interaction (PPI)
-
-The PPI dataset consists of **24 graphs**, each representing protein interactions in different human tissues:
-
-<div class="stat-cards">
-  <div class="stat-card">
-    <div class="stat-number">20</div>
-    <div class="stat-label">Training Graphs</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number">2</div>
-    <div class="stat-label">Validation Graphs</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number">2</div>
-    <div class="stat-label">Test Graphs</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number">121</div>
-    <div class="stat-label">Function Classes</div>
-  </div>
-</div>
-
-Each graph contains:
-- **Nodes:** Proteins (typically 1000-3000 per graph)
-- **Edges:** Physical interactions (typically 10,000-30,000 per graph)
-- **Node Features:** 50-dimensional vectors encoding:
-  - Positional gene sets
-  - Motif gene sets
-  - Immunological signatures
-- **Labels:** 121-dimensional binary vectors (one per Gene Ontology term)
-
 ---
 
 ## What Makes Graphs Different?
 
 If you're coming from standard PyTorch, you're used to tensors with fixed shapes like `(batch_size, channels, height, width)` for images. **Graphs break this assumption.**
-
-### Interactive: Explore a Simple Graph
-
-Drag the nodes around and hover over them to get an intuition for how a small protein interaction graph looks.
-
-<div id="graph-demo" style="height: 400px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
-
-<!-- vis-network library (from CDN) -->
-<script type="text/javascript" src="https://unpkg.com/vis-network@9.1.6/dist/vis-network.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.6/styles/vis-network.min.css"/>
-
-<script type="text/javascript">
-  if (typeof window !== 'undefined') {
-    const container = document.getElementById('graph-demo');
-    if (container) {
-      const nodes = new vis.DataSet([
-        { id: 1, label: 'Protein 1' },
-        { id: 2, label: 'Protein 2' },
-        { id: 3, label: 'Protein 3' },
-        { id: 4, label: 'Protein 4' },
-        { id: 5, label: 'Protein 5' },
-      ]);
-
-      const edges = new vis.DataSet([
-        { from: 1, to: 2 },
-        { from: 1, to: 3 },
-        { from: 2, to: 4 },
-        { from: 3, to: 5 },
-        { from: 4, to: 5 },
-      ]);
-
-      const data = { nodes, edges };
-      const options = {
-        physics: { stabilization: true },
-        nodes: {
-          shape: 'dot',
-          size: 18,
-          font: { size: 14 }
-        },
-        edges: {
-          width: 2,
-          color: { color: '#667eea' }
-        }
-      };
-
-      new vis.Network(container, data, options);
-    }
-  }
-</script>
 
 ### Key Differences from Images
 
@@ -319,21 +238,47 @@ edge_index = torch.tensor([[0, 1, 2, ...],  # Source nodes
 
 The `edge_index` format is more efficient than a full adjacency matrix for sparse graphs.
 
-### Visualizing a Protein Interaction Network
-
-Let's visualize a protein's neighborhood to understand the graph structure:
-
-![Subgraph Visualization]({{ site.baseurl }}/assets/subgraph_vis.png)
-
-This visualization shows a 2-hop neighborhood around a central protein. Node size and color represent the number of connections (degree)—proteins with more interactions appear larger and brighter. The spring layout algorithm reveals natural clusters of interacting proteins.
-
 ---
 
 ## Exploring the Dataset
 
-### Loading the PPI Dataset
+### Overview: Protein-Protein Interaction (PPI) Dataset
 
-Let's start by loading the dataset using PyTorch Geometric:
+The PPI dataset consists of **24 graphs**, each representing protein interactions in different human tissues. This is a real-world biological dataset commonly used for benchmarking graph neural networks.
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <div class="stat-number">20</div>
+    <div class="stat-label">Training Graphs</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">2</div>
+    <div class="stat-label">Validation Graphs</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">2</div>
+    <div class="stat-label">Test Graphs</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">121</div>
+    <div class="stat-label">Function Classes</div>
+  </div>
+</div>
+
+### Dataset Structure
+
+Each graph contains:
+- **Nodes:** Proteins (typically 1,000-3,000 per graph)
+- **Edges:** Physical interactions (typically 10,000-30,000 per graph)
+- **Node Features:** 50-dimensional vectors encoding:
+  - Positional gene sets
+  - Motif gene sets
+  - Immunological signatures
+- **Labels:** 121-dimensional binary vectors (one per Gene Ontology term)
+
+### Loading the Dataset with PyTorch Geometric
+
+Let's load the dataset using PyTorch Geometric:
 
 ```python
 from torch_geometric.datasets import PPI
@@ -355,7 +300,15 @@ print(f"Number of nodes in first graph: {train_dataset[0].num_nodes}")  # ~1767
 print(f"Number of edges in first graph: {train_dataset[0].num_edges}")  # ~32318
 ```
 
-**Key observation:** The first training graph has 1,767 proteins with 32,318 interactions—this is a dense interaction network!
+**Key observation:** The first training graph has 1,767 proteins with 32,318 interactions—this is a **dense interaction network**! Each protein connects to many others, which is biologically meaningful since proteins often work in complexes.
+
+### Visualizing the Graph Structure
+
+Let's visualize a protein's neighborhood to understand the graph structure:
+
+![Subgraph Visualization]({{ site.baseurl }}/assets/subgraph_vis.png)
+
+This visualization shows a 2-hop neighborhood around a central protein. Node size and color represent the number of connections (degree)—proteins with more interactions appear larger and brighter. The spring layout algorithm reveals natural clusters of interacting proteins.
 
 ### Class Distribution Analysis
 
@@ -363,7 +316,7 @@ Understanding the distribution of protein functions helps us interpret model per
 
 ![Class Distribution]({{ site.baseurl }}/assets/class_dist.png)
 
-The class distribution shows that protein functions are **highly imbalanced**—some functions are common (appear in many proteins) while others are rare. This is typical in biological datasets and something we need to account for in our evaluation metrics.
+The class distribution shows that protein functions are **highly imbalanced**—some functions are common (appear in many proteins) while others are rare. This is typical in biological datasets and something we need to account for in our evaluation metrics. We'll use micro-averaged F1 score to handle this imbalance.
 
 ---
 
