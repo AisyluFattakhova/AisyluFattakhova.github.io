@@ -92,6 +92,12 @@ Explore four tiny graphs below—undirected, directed, weighted, and bipartite. 
 
       const baseOptions = {
         physics: { stabilization: true },
+        interaction: {
+          zoomView: false,
+          dragView: true,
+          dragNodes: true,
+          selectConnectedEdges: false
+        },
         nodes: {
           shape: 'dot',
           size: 18,

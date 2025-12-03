@@ -193,6 +193,9 @@ blockquote {
 
 .toc-button {
   flex: 1 1 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 0.75rem 1rem;
   border-radius: 999px;
