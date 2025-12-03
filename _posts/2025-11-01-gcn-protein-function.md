@@ -18,7 +18,7 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
 - ❓ New to graph neural networks and PyTorch Geometric
 
 <div style="text-align: center; margin: 2.5rem 0;">
-  <a href="https://colab.research.google.com/github/yourusername/yourrepo/blob/main/notebook.ipynb" target="_blank" class="colab-button">
+  <a href="https://colab.research.google.com/drive/1ldaz7PJEzqI_cbFVz23U94Wngvsyll_H?usp=sharing" target="_blank" class="colab-button">
     <span style="font-size: 1.5rem; line-height: 1;">🚀</span>
     <span>Open in Google Colab</span>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
@@ -1425,7 +1425,7 @@ The t-SNE visualization reveals that the GCN learned to **cluster proteins by fu
 ## Try It Yourself!
 
 <div style="text-align: center; margin: 2.5rem 0;">
-  <a href="https://colab.research.google.com/github/yourusername/yourrepo/blob/main/notebook.ipynb" target="_blank" class="colab-button">
+  <a href="https://colab.research.google.com/drive/1ldaz7PJEzqI_cbFVz23U94Wngvsyll_H?usp=sharing" target="_blank" class="colab-button">
     <span style="font-size: 1.5rem; line-height: 1;">🚀</span>
     <span>Open in Google Colab</span>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
