@@ -402,6 +402,11 @@ Explore how message passing works in this detailed interactive visualization. Wa
       const statusText = document.getElementById('msg-status-text');
       const formulaDiv = document.getElementById('msg-formula');
       
+      if (!statusText) {
+        console.warn('Status text element not found');
+        return;
+      }
+      
       const steps = {
         0: {
           title: 'Step 0: Initial State',
@@ -473,11 +478,15 @@ Explore how message passing works in this detailed interactive visualization. Wa
       };
       
       if (steps[step]) {
-        statusText.innerHTML = `<p><strong>${steps[step].title}</strong></p>${steps[step].content}`;
-        if (step >= 2) {
-          formulaDiv.style.display = 'block';
-        } else {
-          formulaDiv.style.display = 'none';
+        if (statusText) {
+          statusText.innerHTML = `<p><strong>${steps[step].title}</strong></p>${steps[step].content}`;
+        }
+        if (formulaDiv) {
+          if (step >= 2) {
+            formulaDiv.style.display = 'block';
+          } else {
+            formulaDiv.style.display = 'none';
+          }
         }
       }
     }
@@ -605,10 +614,11 @@ Explore how message passing works in this detailed interactive visualization. Wa
         // Step 2: Messages flow
         updateStatusPanel(2);
         document.getElementById('msg-formula').style.display = 'block';
-        msgEdges.forEach((edge, idx) => {
+        // Update edges by ID directly
+        ['e1', 'e2', 'e3', 'e4', 'e5'].forEach((edgeId, idx) => {
           setTimeout(() => {
             msgEdges.update({ 
-              id: edge.id, 
+              id: edgeId, 
               color: { color: '#667eea', highlight: '#667eea' }, 
               width: 4,
               label: 'msg',
@@ -652,60 +662,64 @@ Explore how message passing works in this detailed interactive visualization. Wa
     }
 
     function stepMessagePassing() {
-      if (isAnimating) return;
+      if (isAnimating) {
+        return;
+      }
       
-      const steps = [
-        () => {
-          updateStatusPanel(1);
-          [1, 2, 3, 4, 5].forEach(id => {
-            msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
+      // Define all steps
+      if (currentStep === 0) {
+        // Step 1: Highlight neighbors
+        updateStatusPanel(1);
+        [1, 2, 3, 4, 5].forEach(id => {
+          msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
+        });
+        document.getElementById('step-msg').textContent = '⏭ Step 2: Messages';
+        currentStep = 1;
+      } else if (currentStep === 1) {
+        // Step 2: Messages flow
+        updateStatusPanel(2);
+        document.getElementById('msg-formula').style.display = 'block';
+        ['e1', 'e2', 'e3', 'e4', 'e5'].forEach(edgeId => {
+          msgEdges.update({ 
+            id: edgeId, 
+            color: { color: '#667eea' }, 
+            width: 4,
+            label: 'msg',
+            arrows: { to: { enabled: true, scaleFactor: 0.8 } }
           });
-          document.getElementById('step-msg').textContent = '⏭ Step 2: Messages';
-        },
-        () => {
-          updateStatusPanel(2);
-          document.getElementById('msg-formula').style.display = 'block';
-          msgEdges.forEach(edge => {
-            msgEdges.update({ 
-              id: edge.id, 
-              color: { color: '#667eea' }, 
-              width: 4,
-              label: 'msg',
-              arrows: { to: { enabled: true, scaleFactor: 0.8 } }
-            });
-          });
-          document.getElementById('step-msg').textContent = '⏭ Step 3: Normalize';
-        },
-        () => {
-          updateStatusPanel(3);
-          document.getElementById('step-msg').textContent = '⏭ Step 4: Aggregate';
-        },
-        () => {
-          updateStatusPanel(4);
-          msgNodes.update({ 
-            id: 0, 
-            color: { background: '#9c27b0', border: '#6a1b9a' },
-            label: 'P0\nAggregating...',
-            font: { color: '#ffffff' }
-          });
-          document.getElementById('step-msg').textContent = '⏭ Step 5: Activate';
-        },
-        () => {
-          updateStatusPanel(5);
-          msgNodes.update({ 
-            id: 0, 
-            color: { background: '#4caf50', border: '#2e7d32' },
-            label: 'P0\n[0.48, 0.52, 0.44]',
-            font: { color: '#000000' }
-          });
-          document.getElementById('step-msg').textContent = '🔄 Reset';
-        }
-      ];
-      
-      if (currentStep < steps.length) {
-        steps[currentStep]();
-        currentStep++;
+        });
+        document.getElementById('step-msg').textContent = '⏭ Step 3: Normalize';
+        currentStep = 2;
+      } else if (currentStep === 2) {
+        // Step 3: Normalize
+        updateStatusPanel(3);
+        document.getElementById('step-msg').textContent = '⏭ Step 4: Aggregate';
+        currentStep = 3;
+      } else if (currentStep === 3) {
+        // Step 4: Aggregate
+        updateStatusPanel(4);
+        msgNodes.update({ 
+          id: 0, 
+          color: { background: '#9c27b0', border: '#6a1b9a' },
+          label: 'P0\nAggregating...',
+          font: { color: '#ffffff' }
+        });
+        document.getElementById('step-msg').textContent = '⏭ Step 5: Activate';
+        currentStep = 4;
+      } else if (currentStep === 4) {
+        // Step 5: Activation
+        updateStatusPanel(5);
+        msgNodes.update({ 
+          id: 0, 
+          color: { background: '#4caf50', border: '#2e7d32' },
+          label: 'P0\n[0.48, 0.52, 0.44]',
+          title: 'Updated Features\n[0.48, 0.52, 0.44]',
+          font: { color: '#000000' }
+        });
+        document.getElementById('step-msg').textContent = '🔄 Reset';
+        currentStep = 5;
       } else {
+        // Reset after all steps
         resetMessagePassing();
       }
     }
@@ -721,9 +735,10 @@ Explore how message passing works in this detailed interactive visualization. Wa
         { id: 4, label: 'P4\n[0.80, 0.40, 0.20]', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
         { id: 5, label: 'P5\n[0.30, 0.70, 0.60]', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } }
       ]);
-      msgEdges.forEach(edge => {
+      // Reset edges by ID
+      ['e1', 'e2', 'e3', 'e4', 'e5'].forEach(edgeId => {
         msgEdges.update({ 
-          id: edge.id, 
+          id: edgeId, 
           color: { color: '#888' }, 
           width: 2,
           label: '',
