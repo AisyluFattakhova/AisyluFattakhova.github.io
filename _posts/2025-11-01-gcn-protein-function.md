@@ -1272,14 +1272,23 @@ For multi-label classification, we use **micro-averaged F1** because:
 
 ### Training Curves
 
-Let's examine how different architectures converge:
+Let's examine how different architectures converge during training:
 
-![Loss Curve]({{ site.baseurl }}/assets/loss_curve.png)
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+  <div style="background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);">
+    <h4 style="margin-top: 0; color: #667eea; text-align: center;">Training Loss</h4>
+    ![Loss Curve]({{ site.baseurl }}/assets/loss_curve.png)
+  </div>
+  <div style="background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);">
+    <h4 style="margin-top: 0; color: #667eea; text-align: center;">Validation F1 Score</h4>
+    ![F1 Curve]({{ site.baseurl }}/assets/f1_curve.png)
+  </div>
+</div>
 
 **Key observations:**
-- **2-Layer GCN:** Converges smoothly and achieves the lowest training loss
-- **3-Layer GCN:** Shows more variance in F1 scores during training
-- **4-Layer GCN:** Struggles more—deeper networks can suffer from over-smoothing
+- **2-Layer GCN:** Converges smoothly and achieves the lowest training loss with stable F1 scores
+- **3-Layer GCN:** Shows more variance in F1 scores during training, but can achieve good performance
+- **4-Layer GCN:** Struggles more—deeper networks can suffer from over-smoothing, leading to lower F1 scores
 
 ### Performance Comparison
 
