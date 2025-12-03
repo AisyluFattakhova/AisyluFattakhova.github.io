@@ -1,6 +1,6 @@
 # Site Settings
 title: Graph Neural Networks Blog
-description: Graph-based Protein Function Prediction: A PyG Tutorial
+description: "Graph-based Protein Function Prediction: A PyG Tutorial"
 url: https://AisyluFattakhova.github.io
 baseurl: ""
 author: Aisylu Fattakhova, Azalia Alisheva
