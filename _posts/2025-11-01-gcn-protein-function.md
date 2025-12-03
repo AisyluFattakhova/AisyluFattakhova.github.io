@@ -342,6 +342,176 @@ At its core, a GCN allows each node to **aggregate information from its neighbor
 
 **Biological intuition:** If a protein's neighbors are all involved in cellular respiration, it's likely that protein is too. If its neighbors are all immune-related, it probably is as well.
 
+### Interactive: Message Passing in Action
+
+Explore how message passing works in this interactive visualization. **Click on the central node** to see how it aggregates information from its neighbors. You can drag nodes to rearrange them and see how the aggregation process works.
+
+<div id="message-passing-demo" style="height: 450px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0; background: white;"></div>
+
+<div style="text-align: center; margin-bottom: 1rem;">
+  <button id="reset-msg" style="padding: 0.5rem 1rem; margin: 0.25rem; border-radius: 5px; background: #667eea; color: white; border: none; cursor: pointer;">Reset Animation</button>
+  <button id="step-msg" style="padding: 0.5rem 1rem; margin: 0.25rem; border-radius: 5px; background: #764ba2; color: white; border: none; cursor: pointer;">Step Through</button>
+</div>
+
+<script type="text/javascript">
+  if (typeof window !== 'undefined') {
+    let msgNetwork = null;
+    let msgNodes = null;
+    let msgEdges = null;
+    let currentStep = 0;
+
+    function initMessagePassing() {
+      const container = document.getElementById('message-passing-demo');
+      if (!container || typeof vis === 'undefined') return;
+
+      // Create nodes - central protein with neighbors
+      msgNodes = new vis.DataSet([
+        { id: 0, label: 'Protein 0\n(Central)', x: 0, y: 0, color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#ffffff', size: 16 }, fixed: false },
+        { id: 1, label: 'Neighbor 1', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
+        { id: 2, label: 'Neighbor 2', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
+        { id: 3, label: 'Neighbor 3', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
+        { id: 4, label: 'Neighbor 4', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
+        { id: 5, label: 'Neighbor 5', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } }
+      ]);
+
+      // Create edges - connections to central node
+      msgEdges = new vis.DataSet([
+        { from: 1, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
+        { from: 2, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
+        { from: 3, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
+        { from: 4, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } },
+        { from: 5, to: 0, color: { color: '#888' }, width: 2, smooth: { type: 'continuous' } }
+      ]);
+
+      const data = { nodes: msgNodes, edges: msgEdges };
+      const options = {
+        physics: {
+          stabilization: { iterations: 200 },
+          barnesHut: { gravitationalConstant: -30000 }
+        },
+        interaction: {
+          zoomView: false,
+          dragView: true,
+          dragNodes: true
+        },
+        nodes: {
+          shape: 'dot',
+          size: 25,
+          font: { size: 14 }
+        },
+        edges: {
+          arrows: { to: { enabled: false } },
+          smooth: { type: 'continuous', roundness: 0.5 }
+        },
+        layout: {
+          hierarchical: {
+            enabled: false
+          }
+        }
+      };
+
+      msgNetwork = new vis.Network(container, data, options);
+
+      // Animation: Highlight edges and nodes during message passing
+      msgNetwork.on('click', function(params) {
+        if (params.nodes.length > 0 && params.nodes[0] === 0) {
+          animateMessagePassing();
+        }
+      });
+
+      // Reset button
+      document.getElementById('reset-msg')?.addEventListener('click', resetMessagePassing);
+      document.getElementById('step-msg')?.addEventListener('click', stepMessagePassing);
+    }
+
+    function animateMessagePassing() {
+      // Step 1: Highlight neighbors
+      [1, 2, 3, 4, 5].forEach(id => {
+        msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
+      });
+      
+      setTimeout(() => {
+        // Step 2: Show message flow (highlight edges)
+        msgEdges.forEach(edge => {
+          if (edge.to === 0) {
+            msgEdges.update({ ...edge, color: { color: '#667eea' }, width: 4 });
+          }
+        });
+        
+        setTimeout(() => {
+          // Step 3: Update central node (aggregation complete)
+          msgNodes.update({ 
+            id: 0, 
+            color: { background: '#4caf50', border: '#2e7d32' },
+            label: 'Protein 0\n(Aggregated!)'
+          });
+          
+          setTimeout(() => {
+            resetMessagePassing();
+          }, 2000);
+        }, 800);
+      }, 800);
+    }
+
+    function stepMessagePassing() {
+      const steps = [
+        () => {
+          [1, 2, 3, 4, 5].forEach(id => {
+            msgNodes.update({ id: id, color: { background: '#ff9800', border: '#e65100' } });
+          });
+          document.getElementById('step-msg').textContent = 'Step 2: Messages Flow';
+        },
+        () => {
+          msgEdges.forEach(edge => {
+            if (edge.to === 0) {
+              msgEdges.update({ ...edge, color: { color: '#667eea' }, width: 4 });
+            }
+          });
+          document.getElementById('step-msg').textContent = 'Step 3: Aggregate';
+        },
+        () => {
+          msgNodes.update({ 
+            id: 0, 
+            color: { background: '#4caf50', border: '#2e7d32' },
+            label: 'Protein 0\n(Aggregated!)'
+          });
+          document.getElementById('step-msg').textContent = 'Reset';
+        }
+      ];
+      
+      if (currentStep < steps.length) {
+        steps[currentStep]();
+        currentStep++;
+      } else {
+        resetMessagePassing();
+      }
+    }
+
+    function resetMessagePassing() {
+      currentStep = 0;
+      msgNodes.update([
+        { id: 0, label: 'Protein 0\n(Central)', color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#ffffff' } },
+        { id: 1, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 2, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 3, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 4, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
+        { id: 5, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } }
+      ]);
+      msgEdges.forEach(edge => {
+        msgEdges.update({ ...edge, color: { color: '#888' }, width: 2 });
+      });
+      document.getElementById('step-msg').textContent = 'Step Through';
+    }
+
+    // Initialize when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMessagePassing);
+    } else {
+      initMessagePassing();
+    }
+  }
+</script>
+
 ### The Mathematics
 
 The Graph Convolutional layer uses this propagation rule:
@@ -382,6 +552,30 @@ Where:
 ## Building Our GCN Architecture
 
 ### The Model Definition
+
+### Architecture Diagram
+
+Our GCN architecture follows this structure:
+
+```mermaid
+graph LR
+    A["Input Features<br/>50 dimensions"] -->|"GCN Layer 1<br/>+ ReLU + Dropout"| B["Hidden Layer<br/>256 dimensions"]
+    B -->|"GCN Layer 2<br/>+ ReLU + Dropout"| C["Hidden Layer<br/>256 dimensions"]
+    C -->|"GCN Layer 3<br/>(No activation)"| D["Output Logits<br/>121 classes"]
+    D -->|"Sigmoid"| E["Multi-label<br/>Predictions"]
+    
+    style A fill:#667eea,stroke:#4c51bf,color:#fff
+    style B fill:#f093fb,stroke:#ea580c,color:#000
+    style C fill:#f093fb,stroke:#ea580c,color:#000
+    style D fill:#4facfe,stroke:#00f2fe,color:#000
+    style E fill:#4caf50,stroke:#2e7d32,color:#fff
+```
+
+**Key points:**
+- **Input:** 50-dimensional node features (biological descriptors)
+- **Hidden layers:** 256-dimensional embeddings (configurable number of layers)
+- **Output:** 121 logits (one per function class)
+- **Activation:** ReLU between layers, no activation on final layer (sigmoid applied in loss)
 
 Here's our GCN implementation in PyTorch Geometric:
 
@@ -732,3 +926,13 @@ The complete code is available in the Google Colab notebook above. Clone it, run
   };
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<!-- Mermaid.js for architecture diagrams -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ 
+    startOnLoad: true,
+    theme: 'default',
+    flowchart: { useMaxWidth: true, htmlLabels: true }
+  });
+</script>
