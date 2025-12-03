@@ -160,12 +160,35 @@ blockquote {
 }
 
 // Table of contents styling
-.post-content > ul:first-of-type {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
-  border: 2px solid rgba(102, 126, 234, 0.3);
-  border-radius: 12px;
-  padding: 2rem;
+// Table of contents styling - pretty buttons
+.toc-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin: 2rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border-radius: 14px;
+  border: 2px solid rgba(102, 126, 234, 0.35);
+}
+
+.toc-button {
+  flex: 1 1 220px;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+.toc-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(102, 126, 234, 0.6);
+  background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);
 }
 
 // Links

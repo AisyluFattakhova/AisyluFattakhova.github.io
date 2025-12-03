@@ -23,14 +23,16 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
 
 ## Table of Contents
 
-1. [Understanding the Problem](#understanding-the-problem)
-2. [What Makes Graphs Different?](#what-makes-graphs-different)
-3. [Exploring the Dataset](#exploring-the-dataset)
-4. [Graph Convolutional Networks: The Core Idea](#graph-convolutional-networks-the-core-idea)
-5. [Building Our GCN Architecture](#building-our-gcn-architecture)
-6. [Training and Evaluation](#training-and-evaluation)
-7. [Results and Insights](#results-and-insights)
-8. [Visualizing Learned Representations](#visualizing-learned-representations)
+<div class="toc-buttons">
+  <a class="toc-button" href="#understanding-the-problem">Understanding the Problem</a>
+  <a class="toc-button" href="#what-makes-graphs-different">What Makes Graphs Different?</a>
+  <a class="toc-button" href="#exploring-the-dataset">Exploring the Dataset</a>
+  <a class="toc-button" href="#graph-convolutional-networks-the-core-idea">GCN: The Core Idea</a>
+  <a class="toc-button" href="#building-our-gcn-architecture">Building the GCN</a>
+  <a class="toc-button" href="#training-and-evaluation">Training & Evaluation</a>
+  <a class="toc-button" href="#results-and-insights">Results & Insights</a>
+  <a class="toc-button" href="#visualizing-learned-representations">Visualizing Representations</a>
+</div>
 
 ---
 
