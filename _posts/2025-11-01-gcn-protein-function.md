@@ -164,9 +164,11 @@ At its core, a GCN allows each node to **aggregate information from its neighbor
 
 The Graph Convolutional layer uses this propagation rule:
 
+{::nomarkdown}
 \[
 H^{(l+1)} = \sigma\left(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}} H^{(l)} W^{(l)}\right)
 \]
+{:/}
 
 Where:
 
@@ -178,7 +180,7 @@ Where:
   <li>\( \sigma \) is the <strong>activation function</strong> (typically ReLU)</li>
 </ul>
 
-The normalization $\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}$ ensures that nodes with many neighbors don't dominate the aggregation—it's like averaging contributions.
+The normalization {::nomarkdown}\(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}\){:/} ensures that nodes with many neighbors don't dominate the aggregation—it's like averaging contributions.
 
 ### Why Multiple Layers?
 
