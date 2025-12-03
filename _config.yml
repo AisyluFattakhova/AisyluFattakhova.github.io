@@ -1,0 +1,22 @@
+# Site Settings
+title: Your Site Name
+description: Description of your site
+url: https://AisyluFattakhova.github.io
+baseurl: ""
+
+# Build Settings
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Markdown Processor
+markdown: kramdown
+
+# Exclude files from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
