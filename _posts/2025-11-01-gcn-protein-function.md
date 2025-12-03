@@ -40,13 +40,13 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
 
 We formulate protein function prediction as a **multi-label node classification** task on a graph:
 
-- **Graph Structure:** $G = (V, E)$ where:
-  - $V$ = Set of proteins (nodes)
-  - $E$ = Set of physical interactions between proteins (edges)
+- **Graph Structure:** \( G = (V, E) \) where:
+  - \( V \) = Set of proteins (nodes)
+  - \( E \) = Set of physical interactions between proteins (edges)
 
-- **Input:** Node features $X \in \mathbb{R}^{N \times 50}$ (50 biological descriptors per protein)
+- **Input:** Node features \( X \in \mathbb{R}^{N \times 50} \) (50 biological descriptors per protein)
 
-- **Output:** Multi-label predictions $Y \in \{0,1\}^{N \times 121}$ (121 Gene Ontology terms)
+- **Output:** Multi-label predictions \( Y \in \{0,1\}^{N \times 121} \) (121 Gene Ontology terms)
 
 ### Why Multi-Label Classification?
 
@@ -164,14 +164,16 @@ At its core, a GCN allows each node to **aggregate information from its neighbor
 
 The Graph Convolutional layer uses this propagation rule:
 
-$$H^{(l+1)} = \sigma\left(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}} H^{(l)} W^{(l)}\right)$$
+\[
+H^{(l+1)} = \sigma\left(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}} H^{(l)} W^{(l)}\right)
+\]
 
 Where:
-- $\tilde{A} = A + I_N$ is the adjacency matrix with **self-loops** (nodes can use their own features)
-- $\tilde{D}$ is the **degree matrix** (normalizes by number of neighbors)  
-- $W^{(l)}$ is the **learnable weight matrix** for layer $l$
-- $H^{(l)}$ is the **node embeddings** at layer $l$
-- $\sigma$ is the **activation function** (typically ReLU)
+- \( \tilde{A} = A + I_N \) is the adjacency matrix with **self-loops** (nodes can use their own features)
+- \( \tilde{D} \) is the **degree matrix** (normalizes by number of neighbors)  
+- \( W^{(l)} \) is the **learnable weight matrix** for layer \( l \)
+- \( H^{(l)} \) is the **node embeddings** at layer \( l \)
+- \( \sigma \) is the **activation function** (typically ReLU)
 
 The normalization $\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}$ ensures that nodes with many neighbors don't dominate the aggregation—it's like averaging contributions.
 
@@ -241,7 +243,10 @@ class GCN(torch.nn.Module):
 
 Since this is multi-label classification, we use **Binary Cross Entropy with Logits Loss**:
 
-$$\mathcal{L} = - \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{121} \left[ y_{ij} \cdot \log(\sigma(\hat{y}_{ij})) + (1 - y_{ij}) \cdot \log(1 - \sigma(\hat{y}_{ij})) \right]$$
+\[
+\mathcal{L} = - \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{121}
+\left[ y_{ij} \cdot \log(\sigma(\hat{y}_{ij})) + (1 - y_{ij}) \cdot \log(1 - \sigma(\hat{y}_{ij})) \right]
+\]
 
 Each of the 121 classes is treated as an **independent binary classification problem**. This is different from standard CrossEntropyLoss, which assumes mutually exclusive classes.
 
