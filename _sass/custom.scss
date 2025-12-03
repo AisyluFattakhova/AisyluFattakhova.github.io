@@ -242,6 +242,33 @@ a:hover {
   border-radius: 2px;
 }
 
+// Graph row (interactive graph types)
+.graph-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  margin: 1.5rem 0 2rem 0;
+  overflow-x: auto;
+}
+
+.graph-box {
+  flex: 1 1 0;
+  min-width: 220px;
+}
+
+.graph-box h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.graph-canvas {
+  height: 260px;
+  border-radius: 10px;
+  border: 2px solid #667eea;
+}
+
 // Stat cards (inspired by MARK)
 .stat-cards {
   display: grid;

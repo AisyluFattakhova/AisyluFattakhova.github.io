@@ -55,11 +55,26 @@ Graphs are powerful when **relationships matter** as much as the individual data
 
 ### Interactive: Different Graph Types
 
-Explore three tiny graphs below—undirected, directed, and bipartite. You can **drag nodes** and **inspect different structures** interactively.
+Explore four tiny graphs below—undirected, directed, weighted, and bipartite. You can **drag nodes** and **inspect different structures** interactively.
 
-<div id="graph-undirected" style="height: 260px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
-<div id="graph-directed" style="height: 260px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
-<div id="graph-bipartite" style="height: 260px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
+<div class="graph-row">
+  <div class="graph-box">
+    <h4>Undirected Graph</h4>
+    <div id="graph-undirected" class="graph-canvas"></div>
+  </div>
+  <div class="graph-box">
+    <h4>Directed Graph</h4>
+    <div id="graph-directed" class="graph-canvas"></div>
+  </div>
+  <div class="graph-box">
+    <h4>Weighted Graph</h4>
+    <div id="graph-weighted" class="graph-canvas"></div>
+  </div>
+  <div class="graph-box">
+    <h4>Bipartite Graph</h4>
+    <div id="graph-bipartite" class="graph-canvas"></div>
+  </div>
+</div>
 
 <!-- vis-network library (from CDN) -->
 <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.6/dist/vis-network.min.js"></script>
@@ -79,7 +94,7 @@ Explore three tiny graphs below—undirected, directed, and bipartite. You can *
         nodes: {
           shape: 'dot',
           size: 18,
-          font: { size: 14 }
+          font: { size: 14, color: '#000000' }
         },
         edges: {
           width: 2,
@@ -125,6 +140,25 @@ Explore three tiny graphs below—undirected, directed, and bipartite. You can *
       { edges: { arrows: { to: { enabled: true, scaleFactor: 0.8 } } } }
     );
 
+    // Weighted toy graph: interaction strengths
+    buildGraph('graph-weighted',
+      [
+        { id: 1, label: 'A' },
+        { id: 2, label: 'B' },
+        { id: 3, label: 'C' }
+      ],
+      [
+        { from: 1, to: 2, width: 1, label: '0.2' },
+        { from: 1, to: 3, width: 4, label: '0.9' },
+        { from: 2, to: 3, width: 2, label: '0.5' }
+      ],
+      {
+        edges: {
+          font: { size: 12, align: 'top', color: '#000000' }
+        }
+      }
+    );
+
     // Bipartite toy graph: Proteins ↔ Functions
     buildGraph('graph-bipartite',
       [
@@ -140,8 +174,8 @@ Explore three tiny graphs below—undirected, directed, and bipartite. You can *
       ],
       {
         groups: {
-          protein: { color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#ffffff' } },
-          function: { color: { background: '#f97316', border: '#ea580c' }, font: { color: '#ffffff' } }
+          protein: { color: { background: '#e0e7ff', border: '#4c51bf' }, font: { color: '#000000' } },
+          function: { color: { background: '#ffedd5', border: '#ea580c' }, font: { color: '#000000' } }
         }
       }
     );
