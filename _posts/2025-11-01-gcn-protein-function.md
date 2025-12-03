@@ -366,7 +366,7 @@ Explore how message passing works in this interactive visualization. **Click on 
 
       // Create nodes - central protein with neighbors
       msgNodes = new vis.DataSet([
-        { id: 0, label: 'Protein 0\n(Central)', x: 0, y: 0, color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#ffffff', size: 16 }, fixed: false },
+        { id: 0, label: 'Protein 0\n(Central)', x: 0, y: 0, color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#000000', size: 16 }, fixed: false },
         { id: 1, label: 'Neighbor 1', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
         { id: 2, label: 'Neighbor 2', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
         { id: 3, label: 'Neighbor 3', color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000', size: 14 } },
@@ -397,7 +397,7 @@ Explore how message passing works in this interactive visualization. **Click on 
         nodes: {
           shape: 'dot',
           size: 25,
-          font: { size: 14 }
+          font: { size: 14, color: '#000000' }
         },
         edges: {
           arrows: { to: { enabled: false } },
@@ -443,7 +443,8 @@ Explore how message passing works in this interactive visualization. **Click on 
           msgNodes.update({ 
             id: 0, 
             color: { background: '#4caf50', border: '#2e7d32' },
-            label: 'Protein 0\n(Aggregated!)'
+            label: 'Protein 0\n(Aggregated!)',
+            font: { color: '#000000' }
           });
           
           setTimeout(() => {
@@ -473,7 +474,8 @@ Explore how message passing works in this interactive visualization. **Click on 
           msgNodes.update({ 
             id: 0, 
             color: { background: '#4caf50', border: '#2e7d32' },
-            label: 'Protein 0\n(Aggregated!)'
+            label: 'Protein 0\n(Aggregated!)',
+            font: { color: '#000000' }
           });
           document.getElementById('step-msg').textContent = 'Reset';
         }
@@ -490,7 +492,7 @@ Explore how message passing works in this interactive visualization. **Click on 
     function resetMessagePassing() {
       currentStep = 0;
       msgNodes.update([
-        { id: 0, label: 'Protein 0\n(Central)', color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#ffffff' } },
+        { id: 0, label: 'Protein 0\n(Central)', color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#000000' } },
         { id: 1, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
         { id: 2, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
         { id: 3, color: { background: '#f093fb', border: '#ea580c' }, font: { color: '#000000' } },
@@ -557,7 +559,7 @@ Where:
 
 Our GCN architecture follows this structure:
 
-```mermaid
+<div id="architecture-diagram" class="mermaid" style="background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); margin: 2rem 0;">
 graph LR
     A["Input Features<br/>50 dimensions"] -->|"GCN Layer 1<br/>+ ReLU + Dropout"| B["Hidden Layer<br/>256 dimensions"]
     B -->|"GCN Layer 2<br/>+ ReLU + Dropout"| C["Hidden Layer<br/>256 dimensions"]
@@ -569,7 +571,7 @@ graph LR
     style C fill:#f093fb,stroke:#ea580c,color:#000
     style D fill:#4facfe,stroke:#00f2fe,color:#000
     style E fill:#4caf50,stroke:#2e7d32,color:#fff
-```
+</div>
 
 **Key points:**
 - **Input:** 50-dimensional node features (biological descriptors)
@@ -930,9 +932,31 @@ The complete code is available in the Google Colab notebook above. Clone it, run
 <!-- Mermaid.js for architecture diagrams -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
-  mermaid.initialize({ 
-    startOnLoad: true,
-    theme: 'default',
-    flowchart: { useMaxWidth: true, htmlLabels: true }
-  });
+  if (typeof window !== 'undefined') {
+    function initMermaid() {
+      if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({ 
+          startOnLoad: true,
+          theme: 'default',
+          flowchart: { 
+            useMaxWidth: true, 
+            htmlLabels: true,
+            curve: 'basis'
+          },
+          securityLevel: 'loose'
+        });
+        
+        // Explicitly render if already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          mermaid.run();
+        }
+      }
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    } else {
+      initMermaid();
+    }
+  }
 </script>

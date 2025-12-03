@@ -226,6 +226,22 @@ a:hover {
   border-bottom: 2px solid #764ba2;
 }
 
+// Mermaid diagram styling
+.mermaid {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  margin: 2rem 0;
+  text-align: center;
+  overflow-x: auto;
+  
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
 // Footer
 .site-footer {
   background: rgba(255, 255, 255, 0.9);
