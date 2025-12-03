@@ -97,6 +97,55 @@ Each graph contains:
 
 If you're coming from standard PyTorch, you're used to tensors with fixed shapes like `(batch_size, channels, height, width)` for images. **Graphs break this assumption.**
 
+### Interactive: Explore a Simple Graph
+
+Drag the nodes around and hover over them to get an intuition for how a small protein interaction graph looks.
+
+<div id="graph-demo" style="height: 400px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
+
+<!-- vis-network library (from CDN) -->
+<script type="text/javascript" src="https://unpkg.com/vis-network@9.1.6/dist/vis-network.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.6/styles/vis-network.min.css"/>
+
+<script type="text/javascript">
+  if (typeof window !== 'undefined') {
+    const container = document.getElementById('graph-demo');
+    if (container) {
+      const nodes = new vis.DataSet([
+        { id: 1, label: 'Protein 1' },
+        { id: 2, label: 'Protein 2' },
+        { id: 3, label: 'Protein 3' },
+        { id: 4, label: 'Protein 4' },
+        { id: 5, label: 'Protein 5' },
+      ]);
+
+      const edges = new vis.DataSet([
+        { from: 1, to: 2 },
+        { from: 1, to: 3 },
+        { from: 2, to: 4 },
+        { from: 3, to: 5 },
+        { from: 4, to: 5 },
+      ]);
+
+      const data = { nodes, edges };
+      const options = {
+        physics: { stabilization: true },
+        nodes: {
+          shape: 'dot',
+          size: 18,
+          font: { size: 14 }
+        },
+        edges: {
+          width: 2,
+          color: { color: '#667eea' }
+        }
+      };
+
+      new vis.Network(container, data, options);
+    }
+  }
+</script>
+
 ### Key Differences from Images
 
 1. **Variable Structure:** Each graph has a different number of nodes and edges—you can't batch them like images
