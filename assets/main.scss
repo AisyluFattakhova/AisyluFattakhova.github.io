@@ -1,0 +1,11 @@
+---
+# Jekyll front matter - makes this file processable by Jekyll and used by minima
+---
+
+// Import the default minima styles
+@import "minima";
+
+// Import our custom styles (defined in `_sass/custom.scss`)
+@import "custom";
+
+
