@@ -34,6 +34,120 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
   <a class="toc-button" href="#visualizing-learned-representations">Visualizing Representations</a>
 </div>
 
+## Graph Basics
+
+### What is a Graph?
+
+In machine learning, a **graph** is a data structure \( G = (V, E) \) where:
+
+- **Nodes \(V\):** entities (proteins, papers, users, molecules)
+- **Edges \(E\):** relationships (interactions, citations, friendships, chemical bonds)
+- **Node features \(X\):** a feature vector for each node (e.g., biological descriptors, text embeddings)
+
+Graphs are powerful when **relationships matter** as much as the individual data points—exactly the case for protein–protein interaction networks.
+
+### Common Types of Graphs
+
+- **Undirected graph:** edges have no direction (e.g., mutual friendship, protein interaction)
+- **Directed graph:** edges have direction (e.g., citation network: paper A → paper B)
+- **Weighted graph:** edges carry strengths or capacities (e.g., interaction confidence scores)
+- **Bipartite graph:** two disjoint node sets with edges only across sets (e.g., users ↔ items in recommendation)
+
+### Interactive: Different Graph Types
+
+Explore three tiny graphs below—undirected, directed, and bipartite. You can **drag nodes** and **inspect different structures** interactively.
+
+<div id="graph-undirected" style="height: 260px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
+<div id="graph-directed" style="height: 260px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
+<div id="graph-bipartite" style="height: 260px; border-radius: 10px; border: 2px solid #667eea; margin: 1.5rem 0;"></div>
+
+<!-- vis-network library (from CDN) -->
+<script type="text/javascript" src="https://unpkg.com/vis-network@9.1.6/dist/vis-network.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.6/styles/vis-network.min.css"/>
+
+<script type="text/javascript">
+  if (typeof window !== 'undefined') {
+    function buildGraph(containerId, nodesData, edgesData, optionsOverrides) {
+      const container = document.getElementById(containerId);
+      if (!container || typeof vis === 'undefined') return;
+
+      const nodes = new vis.DataSet(nodesData);
+      const edges = new vis.DataSet(edgesData);
+
+      const baseOptions = {
+        physics: { stabilization: true },
+        nodes: {
+          shape: 'dot',
+          size: 18,
+          font: { size: 14 }
+        },
+        edges: {
+          width: 2,
+          color: { color: '#667eea' },
+          arrows: { to: false }
+        }
+      };
+
+      const options = Object.assign({}, baseOptions, optionsOverrides || {});
+      new vis.Network(container, { nodes, edges }, options);
+    }
+
+    // Undirected protein interaction toy graph
+    buildGraph('graph-undirected',
+      [
+        { id: 1, label: 'Protein A' },
+        { id: 2, label: 'Protein B' },
+        { id: 3, label: 'Protein C' },
+        { id: 4, label: 'Protein D' }
+      ],
+      [
+        { from: 1, to: 2 },
+        { from: 1, to: 3 },
+        { from: 2, to: 4 },
+        { from: 3, to: 4 }
+      ]
+    );
+
+    // Directed citation toy graph
+    buildGraph('graph-directed',
+      [
+        { id: 1, label: 'Paper 1' },
+        { id: 2, label: 'Paper 2' },
+        { id: 3, label: 'Paper 3' },
+        { id: 4, label: 'Paper 4' }
+      ],
+      [
+        { from: 1, to: 2 },
+        { from: 1, to: 3 },
+        { from: 2, to: 4 },
+        { from: 3, to: 4 }
+      ],
+      { edges: { arrows: { to: { enabled: true, scaleFactor: 0.8 } } } }
+    );
+
+    // Bipartite toy graph: Proteins ↔ Functions
+    buildGraph('graph-bipartite',
+      [
+        { id: 1, label: 'Protein X', group: 'protein' },
+        { id: 2, label: 'Protein Y', group: 'protein' },
+        { id: 3, label: 'Immune', group: 'function' },
+        { id: 4, label: 'Transport', group: 'function' }
+      ],
+      [
+        { from: 1, to: 3 },
+        { from: 1, to: 4 },
+        { from: 2, to: 3 }
+      ],
+      {
+        groups: {
+          protein: { color: { background: '#667eea', border: '#4c51bf' }, font: { color: '#ffffff' } },
+          function: { color: { background: '#f97316', border: '#ea580c' }, font: { color: '#ffffff' } }
+        }
+      }
+    );
+  }
+</script>
+
 ---
 
 ## Understanding the Problem
