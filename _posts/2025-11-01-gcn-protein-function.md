@@ -107,11 +107,6 @@ If you're coming from standard PyTorch, you're used to tensors with fixed shapes
 
 PyG introduces two key tensors:
 
-<div class="code-block-wrapper">
-  <div class="code-header">
-    <span class="code-filename">graph_basics.py</span>
-  </div>
-  <div class="code-content">
 ```python
 # Node feature matrix: [Num_Nodes, Num_Features]
 x = torch.tensor([[0.5, 0.2, ...],  # Node 0 features
@@ -123,8 +118,6 @@ x = torch.tensor([[0.5, 0.2, ...],  # Node 0 features
 edge_index = torch.tensor([[0, 1, 2, ...],  # Source nodes
                            [1, 0, 3, ...]])  # Destination nodes
 ```
-  </div>
-</div>
 
 The `edge_index` format is more efficient than a full adjacency matrix for sparse graphs.
 
@@ -144,11 +137,6 @@ This visualization shows a 2-hop neighborhood around a central protein. Node siz
 
 Let's start by loading the dataset using PyTorch Geometric:
 
-<div class="code-block-wrapper">
-  <div class="code-header">
-    <span class="code-filename">load_dataset.py</span>
-  </div>
-  <div class="code-content">
 ```python
 from torch_geometric.datasets import PPI
 from torch_geometric.loader import DataLoader
@@ -168,8 +156,6 @@ print(f"Labels (Classes): {train_dataset.num_classes}")  # 121
 print(f"Number of nodes in first graph: {train_dataset[0].num_nodes}")  # ~1767
 print(f"Number of edges in first graph: {train_dataset[0].num_edges}")  # ~32318
 ```
-  </div>
-</div>
 
 **Key observation:** The first training graph has 1,767 proteins with 32,318 interactions—this is a dense interaction network!
 
@@ -195,13 +181,11 @@ At its core, a GCN allows each node to **aggregate information from its neighbor
 
 The Graph Convolutional layer uses this propagation rule:
 
-<div class="math-display-wrapper">
 {::nomarkdown}
 \[
 H^{(l+1)} = \sigma\left(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}} H^{(l)} W^{(l)}\right)
 \]
 {:/}
-</div>
 
 Where:
 
@@ -236,11 +220,6 @@ Where:
 
 Here's our GCN implementation in PyTorch Geometric:
 
-<div class="code-block-wrapper">
-  <div class="code-header">
-    <span class="code-filename">gcn_model.py</span>
-  </div>
-  <div class="code-content">
 ```python
 import torch
 import torch.nn.functional as F
@@ -278,8 +257,6 @@ class GCN(torch.nn.Module):
             return x, embeddings
         return x
 ```
-  </div>
-</div>
 
 ### Key Components Explained
 
@@ -292,29 +269,18 @@ class GCN(torch.nn.Module):
 
 Since this is multi-label classification, we use **Binary Cross Entropy with Logits Loss**:
 
-<div class="math-display-wrapper">
 {::nomarkdown}
 \[
 \mathcal{L} = - \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{121}
 \left[ y_{ij} \cdot \log(\sigma(\hat{y}_{ij})) + (1 - y_{ij}) \cdot \log(1 - \sigma(\hat{y}_{ij})) \right]
 \]
 {:/}
-</div>
 
-<div class="info-box info">
-  <strong>📌 Key Difference:</strong> Each of the 121 classes is treated as an **independent binary classification problem**. This is different from standard CrossEntropyLoss, which assumes mutually exclusive classes.
-</div>
+Each of the 121 classes is treated as an **independent binary classification problem**. This is different from standard CrossEntropyLoss, which assumes mutually exclusive classes.
 
-<div class="code-block-wrapper">
-  <div class="code-header">
-    <span class="code-filename">loss_function.py</span>
-  </div>
-  <div class="code-content">
 ```python
 criterion = torch.nn.BCEWithLogitsLoss()  # Applies sigmoid internally
 ```
-  </div>
-</div>
 
 ---
 
@@ -324,11 +290,6 @@ criterion = torch.nn.BCEWithLogitsLoss()  # Applies sigmoid internally
 
 Here's our complete training and evaluation function:
 
-<div class="code-block-wrapper">
-  <div class="code-header">
-    <span class="code-filename">training.py</span>
-  </div>
-  <div class="code-content">
 ```python
 from sklearn.metrics import f1_score
 import time
@@ -393,18 +354,11 @@ def train_eval(model, optimizer, criterion, epochs=50):
 
     return train_loss_hist, val_f1_hist
 ```
-  </div>
-</div>
 
 ### Experiment Setup: Comparing Network Depths
 
 We'll compare 2, 3, and 4-layer architectures to find the optimal depth:
 
-<div class="code-block-wrapper">
-  <div class="code-header">
-    <span class="code-filename">experiment.py</span>
-  </div>
-  <div class="code-content">
 ```python
 # Set device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -434,8 +388,6 @@ for depth in configs:
     results[f'{depth}-Layer'] = {'loss': loss_hist, 'f1': f1_hist}
     trained_models[f'{depth}-Layer'] = model
 ```
-  </div>
-</div>
 
 ### Why Micro-Averaged F1 Score?
 
@@ -464,35 +416,9 @@ Let's examine how different architectures converge:
 ![Performance Bar Chart]({{ site.baseurl }}/assets/performance_bar.png)
 
 **Results:**
-
-<div class="results-table-wrapper">
-<table class="results-table">
-  <thead>
-    <tr>
-      <th>Architecture</th>
-      <th>Micro-F1 Score</th>
-      <th>Performance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr class="best-result">
-      <td><strong>2-Layer GCN</strong></td>
-      <td><strong>0.549</strong></td>
-      <td><span class="badge badge-success">Best</span></td>
-    </tr>
-    <tr>
-      <td><strong>3-Layer GCN</strong></td>
-      <td>0.522</td>
-      <td><span class="badge badge-info">Good</span></td>
-    </tr>
-    <tr>
-      <td><strong>4-Layer GCN</strong></td>
-      <td>0.480</td>
-      <td><span class="badge badge-warning">Lower</span></td>
-    </tr>
-  </tbody>
-</table>
-</div>
+- **2-Layer GCN:** Achieves **0.549** micro-F1 score (best performance)
+- **3-Layer GCN:** Achieves **0.522** micro-F1 score
+- **4-Layer GCN:** Achieves **0.480** micro-F1 score (lowest performance)
 
 ### Why Does a 2-Layer Network Perform Best?
 
@@ -515,11 +441,6 @@ This result aligns with common findings in graph neural networks:
 
 To understand what our model learned, we can visualize the learned embeddings using t-SNE:
 
-<div class="code-block-wrapper">
-  <div class="code-header">
-    <span class="code-filename">visualization.py</span>
-  </div>
-  <div class="code-content">
 ```python
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
@@ -550,8 +471,6 @@ plt.axis('off')
 plt.savefig('assets/tsne_plot.png', dpi=300, bbox_inches='tight')
 plt.show()
 ```
-  </div>
-</div>
 
 ![t-SNE Plot]({{ site.baseurl }}/assets/tsne_plot.png)
 
