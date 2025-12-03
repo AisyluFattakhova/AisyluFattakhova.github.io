@@ -1277,11 +1277,11 @@ Let's examine how different architectures converge during training:
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
   <div style="background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);">
     <h4 style="margin-top: 0; color: #667eea; text-align: center;">Training Loss</h4>
-    ![Loss Curve]({{ site.baseurl }}/assets/loss_curve.png)
+    <img src="{{ site.baseurl }}/assets/loss_curve.png" alt="Loss Curve" style="width: 100%; height: auto; border-radius: 5px;">
   </div>
   <div style="background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);">
     <h4 style="margin-top: 0; color: #667eea; text-align: center;">Validation F1 Score</h4>
-    ![F1 Curve]({{ site.baseurl }}/assets/f1_curve.png)
+    <img src="{{ site.baseurl }}/assets/f1_curve.png" alt="F1 Curve" style="width: 100%; height: auto; border-radius: 5px;">
   </div>
 </div>
 
@@ -1308,17 +1308,17 @@ Let's examine how different architectures converge during training:
   <tbody>
     <tr class="best-result">
       <td><strong>2-Layer GCN</strong></td>
-      <td><strong>0.549</strong></td>
+      <td><strong>0.564</strong></td>
       <td><span class="badge badge-success">Best</span></td>
     </tr>
     <tr>
       <td><strong>3-Layer GCN</strong></td>
-      <td>0.522</td>
+      <td>0.534</td>
       <td><span class="badge badge-info">Good</span></td>
     </tr>
     <tr>
       <td><strong>4-Layer GCN</strong></td>
-      <td>0.480</td>
+      <td>0.462</td>
       <td><span class="badge badge-warning">Lower</span></td>
     </tr>
   </tbody>
