@@ -1,8 +1,9 @@
 # Site Settings
-title: Your Site Name
-description: Description of your site
+title: Aisyu Fattakhova - Graph Neural Networks Blog
+description: Deep learning blog focusing on Graph Neural Networks, PyTorch Geometric, and protein function prediction
 url: https://AisyluFattakhova.github.io
 baseurl: ""
+author: Aisyu Fattakhova
 
 # Build Settings
 theme: minima
