@@ -416,9 +416,35 @@ Let's examine how different architectures converge:
 ![Performance Bar Chart]({{ site.baseurl }}/assets/performance_bar.png)
 
 **Results:**
-- **2-Layer GCN:** Achieves **0.549** micro-F1 score (best performance)
-- **3-Layer GCN:** Achieves **0.522** micro-F1 score
-- **4-Layer GCN:** Achieves **0.480** micro-F1 score (lowest performance)
+
+<div class="results-table-wrapper">
+<table class="results-table">
+  <thead>
+    <tr>
+      <th>Architecture</th>
+      <th>Micro-F1 Score</th>
+      <th>Performance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="best-result">
+      <td><strong>2-Layer GCN</strong></td>
+      <td><strong>0.549</strong></td>
+      <td><span class="badge badge-success">Best</span></td>
+    </tr>
+    <tr>
+      <td><strong>3-Layer GCN</strong></td>
+      <td>0.522</td>
+      <td><span class="badge badge-info">Good</span></td>
+    </tr>
+    <tr>
+      <td><strong>4-Layer GCN</strong></td>
+      <td>0.480</td>
+      <td><span class="badge badge-warning">Lower</span></td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 ### Why Does a 2-Layer Network Perform Best?
 
