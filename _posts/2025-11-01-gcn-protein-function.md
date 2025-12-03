@@ -169,11 +169,14 @@ H^{(l+1)} = \sigma\left(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{
 \]
 
 Where:
-- \( \tilde{A} = A + I_N \) is the adjacency matrix with **self-loops** (nodes can use their own features)
-- \( \tilde{D} \) is the **degree matrix** (normalizes by number of neighbors)  
-- \( W^{(l)} \) is the **learnable weight matrix** for layer \( l \)
-- \( H^{(l)} \) is the **node embeddings** at layer \( l \)
-- \( \sigma \) is the **activation function** (typically ReLU)
+
+<ul>
+  <li>\( \tilde{A} = A + I_N \) is the adjacency matrix with <strong>self-loops</strong> (nodes can use their own features)</li>
+  <li>\( \tilde{D} \) is the <strong>degree matrix</strong> (normalizes by number of neighbors)</li>
+  <li>\( W^{(l)} \) is the <strong>learnable weight matrix</strong> for layer \( l \)</li>
+  <li>\( H^{(l)} \) is the <strong>node embeddings</strong> at layer \( l \)</li>
+  <li>\( \sigma \) is the <strong>activation function</strong> (typically ReLU)</li>
+</ul>
 
 The normalization $\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}$ ensures that nodes with many neighbors don't dominate the aggregation—it's like averaging contributions.
 
