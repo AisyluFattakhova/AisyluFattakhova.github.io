@@ -24,6 +24,7 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
 ## Table of Contents
 
 <div class="toc-buttons">
+  <a class="toc-button" href="#graph-basics">Graph Basics</a>
   <a class="toc-button" href="#understanding-the-problem">Understanding the Problem</a>
   <a class="toc-button" href="#what-makes-graphs-different">What Makes Graphs Different?</a>
   <a class="toc-button" href="#exploring-the-dataset">Exploring the Dataset</a>
@@ -34,7 +35,7 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
   <a class="toc-button" href="#visualizing-learned-representations">Visualizing Representations</a>
 </div>
 
-## Graph Basics
+## Graph Basics {#graph-basics}
 
 ### What is a Graph?
 
