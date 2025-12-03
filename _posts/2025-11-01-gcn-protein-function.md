@@ -3,7 +3,7 @@ layout: post
 title: "Graph Convolutional Networks for Protein Function Prediction: A PyTorch Geometric Tutorial"
 date: 2025-11-01
 categories: [deep-learning, graph-neural-networks, pytorch]
-author: Aisyu Fattakhova, Azalia Alisheva
+author: Aisylu Fattakhova, Azalia Alisheva
 ---
 
 ## Introduction
@@ -484,5 +484,5 @@ The complete code is available in the Google Colab notebook above. Clone it, run
 
 ---
 
-**Authors:** Aisyu Fattakhova, Azalia Alisheva  
+**Authors:** Aisylu Fattakhova, Azalia Alisheva  
 **Date:** November 2025
