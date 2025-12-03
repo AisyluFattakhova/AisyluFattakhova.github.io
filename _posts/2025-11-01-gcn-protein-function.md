@@ -168,9 +168,10 @@ $$H^{(l+1)} = \sigma\left(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1
 
 Where:
 - $\tilde{A} = A + I_N$ is the adjacency matrix with **self-loops** (nodes can use their own features)
-- $\tilde{D}$ is the **degree matrix** (normalizes by number of neighbors)
+- $\tilde{D}$ is the **degree matrix** (normalizes by number of neighbors)  
 - $W^{(l)}$ is the **learnable weight matrix** for layer $l$
 - $H^{(l)}$ is the **node embeddings** at layer $l$
+- $\sigma$ is the **activation function** (typically ReLU)
 
 The normalization $\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}$ ensures that nodes with many neighbors don't dominate the aggregation—it's like averaging contributions.
 

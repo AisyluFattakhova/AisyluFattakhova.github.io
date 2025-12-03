@@ -13,6 +13,14 @@ plugins:
 
 # Markdown Processor
 markdown: kramdown
+kramdown:
+  math_engine: mathjax
+  math_engine_opts:
+    preview: true
+
+# Include custom CSS and MathJax
+sass:
+  sass_dir: _sass
 
 # Exclude files from processing
 exclude:
