@@ -516,3 +516,40 @@ a:hover {
   box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
 }
 
+// Colab button styling
+.colab-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  padding: 1rem 2rem !important;
+  background: linear-gradient(135deg, #f093fb 0%, #4facfe 100%) !important;
+  color: white !important;
+  text-decoration: none !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4) !important;
+  transition: all 0.3s ease !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  font-family: 'Poppins', sans-serif !important;
+  
+  &:hover {
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 12px 32px rgba(240, 147, 251, 0.6) !important;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+  
+  &:active {
+    transform: translateY(-1px) scale(1.02) !important;
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+  
+  span {
+    white-space: nowrap;
+  }
+}
+

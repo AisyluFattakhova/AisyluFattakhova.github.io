@@ -17,7 +17,15 @@ If you're comfortable with PyTorch and deep learning but haven't yet explored **
 - ✅ Understanding of neural network training loops
 - ❓ New to graph neural networks and PyTorch Geometric
 
-> **🚀 Try it yourself in Google Colab:** [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yourusername/yourrepo/blob/main/notebook.ipynb)
+<div style="text-align: center; margin: 2.5rem 0;">
+  <a href="https://colab.research.google.com/github/yourusername/yourrepo/blob/main/notebook.ipynb" target="_blank" class="colab-button">
+    <span style="font-size: 1.5rem; line-height: 1;">🚀</span>
+    <span>Open in Google Colab</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
+      <path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round"/>
+    </svg>
+  </a>
+</div>
 
 ---
 
@@ -1416,7 +1424,15 @@ The t-SNE visualization reveals that the GCN learned to **cluster proteins by fu
 
 ## Try It Yourself!
 
-> **🚀 Open the complete notebook in Google Colab:** [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yourusername/yourrepo/blob/main/notebook.ipynb)
+<div style="text-align: center; margin: 2.5rem 0;">
+  <a href="https://colab.research.google.com/github/yourusername/yourrepo/blob/main/notebook.ipynb" target="_blank" class="colab-button">
+    <span style="font-size: 1.5rem; line-height: 1;">🚀</span>
+    <span>Open in Google Colab</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
+      <path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round"/>
+    </svg>
+  </a>
+</div>
 
 The complete code is available in the Google Colab notebook above. Clone it, run the experiments, and modify the architecture to see how different configurations affect performance!
 
