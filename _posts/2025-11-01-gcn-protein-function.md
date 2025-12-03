@@ -198,7 +198,7 @@ Where:
 </ul>
 
 <div class="info-box tip">
-  <strong>💡 Normalization Insight:</strong> The normalization {::nomarkdown}\(\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}\){:/} ensures that nodes with many neighbors don't dominate the aggregation—it's like averaging contributions.
+  <strong>💡 Normalization Insight:</strong> The normalization \( \tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}} \) ensures that nodes with many neighbors don't dominate the aggregation—it's like averaging contributions.
 </div>
 
 ### Why Multiple Layers?
